@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '@/components/Navigation'
 import RTLWrapper from '@/components/RTLWrapper'
+import FlexibleInput from '@/components/ui/FlexibleInput'
+import EnhancedResultsDisplay from '@/components/ui/EnhancedResultsDisplay'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
@@ -21,7 +23,9 @@ import {
   Activity,
   Zap,
   Award,
-  RefreshCw
+  RefreshCw,
+  Star,
+  Lightbulb
 } from 'lucide-react'
 
 export default function CACCalculatorArabic() {
@@ -126,24 +130,113 @@ export default function CACCalculatorArabic() {
     }
 
     return {
-      cac: cac.toFixed(2),
-      marketingCAC: marketingCAC.toFixed(2),
-      salesCAC: salesCAC.toFixed(2),
-      costPerLead: costPerLead.toFixed(2),
-      leadToCustomerRate: leadToCustomerRate.toFixed(1),
-      roi: roi.toFixed(1),
-      paybackPeriod: paybackPeriod.toFixed(1),
-      overallScore: overallScore.toFixed(0),
-      totalMarketingCosts: totalMarketingCosts.toFixed(2),
-      totalSalesCosts: totalSalesCosts.toFixed(2),
+      content: generateCACContent({
+        cac, marketingCAC, salesCAC, costPerLead, leadToCustomerRate, roi, paybackPeriod,
+        totalMarketingCosts, totalSalesCosts, totalAcquisitionCosts,
+        industry: formData.industry || 'صناعة غير محددة',
+        timePeriod: formData.timePeriod
+      }),
+      metrics: [
+        {
+          label: 'تكلفة اكتساب العميل (CAC)',
+          value: formatCurrency(cac.toString()),
+          color: cac <= customerLTV * 0.5 ? '#22c55e' : cac <= customerLTV ? '#eab308' : '#ef4444',
+          icon: <Users className="w-4 h-4" />
+        },
+        {
+          label: 'تكلفة العميل التسويقية',
+          value: formatCurrency(marketingCAC.toString()),
+          color: marketingCAC <= customerLTV * 0.3 ? '#22c55e' : marketingCAC <= customerLTV * 0.5 ? '#eab308' : '#ef4444',
+          icon: <DollarSign className="w-4 h-4" />
+        },
+        {
+          label: 'تكلفة العميل البيعية',
+          value: formatCurrency(salesCAC.toString()),
+          color: salesCAC <= customerLTV * 0.2 ? '#22c55e' : salesCAC <= customerLTV * 0.4 ? '#eab308' : '#ef4444',
+          icon: <Target className="w-4 h-4" />
+        },
+        {
+          label: 'تكلفة العميل المحتمل',
+          value: formatCurrency(costPerLead.toString()),
+          color: costPerLead <= cac * 0.5 ? '#22c55e' : costPerLead <= cac ? '#eab308' : '#ef4444',
+          icon: <BarChart3 className="w-4 h-4" />
+        },
+        {
+          label: 'معدل تحويل العميل (%)',
+          value: leadToCustomerRate.toFixed(1) + '%',
+          color: leadToCustomerRate >= 5 ? '#22c55e' : leadToCustomerRate >= 2 ? '#eab308' : '#ef4444',
+          icon: <TrendingUp className="w-4 h-4" />
+        },
+        {
+          label: 'العائد على الاستثمار (%)',
+          value: roi.toFixed(1) + '%',
+          color: roi >= 100 ? '#22c55e' : roi >= 50 ? '#eab308' : '#ef4444',
+          icon: <PieChart className="w-4 h-4" />
+        }
+      ],
       recommendations,
       strengths,
-      metrics: {
-        cacScore,
-        conversionScore,
-        roiScore
-      }
+      score: Math.round(overallScore)
     }
+  }
+
+  const generateCACContent = (data: any) => {
+    return `
+### 📊 تحليل تكلفة اكتساب العملاء (CAC)
+
+#### 🎯 نظرة عامة
+- **الصناعة**: ${data.industry}
+- **الفترة**: ${data.timePeriod === 'monthly' ? 'شهري' : data.timePeriod === 'quarterly' ? 'ربع سنوي' : 'سنوي'}
+- **تكلفة اكتساب العميل الإجمالية**: ${formatCurrency(data.cac.toString())}
+
+#### 💰 تحليل التكاليف
+**📈 التكاليف التسويقية**
+- إجمالي التكاليف التسويقية: ${formatCurrency(data.totalMarketingCosts.toString())}
+- تكلفة العميل التسويقية: ${formatCurrency(data.marketingCAC.toString())}
+- تكلفة العميل المحتمل: ${formatCurrency(data.costPerLead.toString())}
+
+**🎯 التكاليف البيعية**
+- إجمالي التكاليف البيعية: ${formatCurrency(data.totalSalesCosts.toString())}
+- تكلفة العميل البيعية: ${formatCurrency(data.salesCAC.toString())}
+
+**📊 التكلفة الإجمالية**
+- إجمالي تكاليف الاكتساب: ${formatCurrency((parseFloat(data.totalMarketingCosts) + parseFloat(data.totalSalesCosts)).toString())}
+- تكلفة اكتساب العميل (CAC): ${formatCurrency(data.cac.toString())}
+
+#### 🔄 تحليل التحويل
+- إجمالي العملاء المحتملين: ${data.totalLeads || 'غير محدد'}
+- إجمالي العملاء: ${data.totalCustomers || 'غير محدد'}
+- معدل تحويل العميل: ${data.leadToCustomerRate}%
+- تكلفة كل عميل محتمل: ${formatCurrency(data.costPerLead.toString())}
+
+#### 📈 تحليل الربحية
+- العائد على الاستثمار: ${data.roi}%
+- فترة استرداد التكاليف: ${data.paybackPeriod} فترة
+- تكلفة اكتساب العميل مقابل القيمة: ${data.cac <= (data.avgCustomerValue || data.cac * 3) * 0.5 ? 'منخفضة' : 'مرتفعة'}
+
+#### 🏆 تقييم الأداء
+${data.cac <= (data.avgCustomerValue || data.cac * 3) * 0.3 ? '🌟 **CAC ممتاز**: تكلفة اكتساب عملاء فعالة جداً' : ''}
+${data.cac <= (data.avgCustomerValue || data.cac * 3) * 0.5 && data.cac > (data.avgCustomerValue || data.cac * 3) * 0.3 ? '✅ **CAC جيد**: تكلفة اكتساب عملاء معقولة' : ''}
+${data.cac <= (data.avgCustomerValue || data.cac * 3) && data.cac > (data.avgCustomerValue || data.cac * 3) * 0.5 ? '⚠️ **CAC مقبول**: هناك مجال للتحسين' : ''}
+${data.cac > (data.avgCustomerValue || data.cac * 3) ? '❌ **CAC ضعيف**: تكلفة اكتساب عملاء أعلى من القيمة' : ''}
+
+${data.leadToCustomerRate >= 10 ? '🌟 **تحويل ممتاز**: معدل تحويل عملاء عالي جداً' : ''}
+${data.leadToCustomerRate >= 5 && data.leadToCustomerRate < 10 ? '✅ **تحويل جيد**: معدل تحويل عملاء جيد' : ''}
+${data.leadToCustomerRate >= 2 && data.leadToCustomerRate < 5 ? '⚠️ **تحويل مقبول**: يمكن تحسين معدل التحويل' : ''}
+${data.leadToCustomerRate < 2 ? '❌ **تحويل ضعيف**: معدل تحويل عملاء منخفض' : ''}
+
+#### 📋 توصيات التحسين
+- ركز على تحسين جودة العملاء المحتملين لزيادة معدل التحويل
+- اختبر قنوات تسويق مختلفة لتقليل تكلفة اكتساب العملاء
+- حسّن كفاءة فريق المبيعات لتقليل تكاليف الاكتساب البيعية
+- راقب مقاييس الأداء بانتظام وعدل الاستراتيجية حسب النتائج
+
+#### 🔍 الخطوات التالية
+1. **تحليل الجمهور**: افهم بشكل أفضل من هم عملاؤك الأكثر قيمة
+2. **تحسين التسويق**: اختبر قنوات وإبداعات مختلفة
+3. **تحسين المبيعات**: درّب فريق المبيعات على تحسين معدلات التحويل
+4. **قياس النتائج**: تتبع CAC ومقاييس الأداء الرئيسية بانتظام
+    `.trim()
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -156,19 +249,6 @@ export default function CACCalculatorArabic() {
       setResults(calculatedResults)
       setIsCalculating(false)
     }, 1500)
-  }
-
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-400'
-    if (score >= 60) return 'text-yellow-400'
-    return 'text-red-400'
-  }
-
-  const getScoreLabel = (score: number) => {
-    if (score >= 80) return 'ممتاز'
-    if (score >= 60) return 'جيد'
-    if (score >= 40) return 'مقبول'
-    return 'ضعيف'
   }
 
   const formatCurrency = (value: string) => {
@@ -197,7 +277,7 @@ export default function CACCalculatorArabic() {
   }
 
   return (
-    <RTLWrapper className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white overflow-hidden relative">
+    <RTLWrapper language="ar" className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white overflow-hidden relative">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent"></div>
@@ -254,145 +334,96 @@ export default function CACCalculatorArabic() {
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-blue-400 mb-3">التكاليف التسويقية</h3>
                       <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-blue-400" />
-                            إجمالي الإنفاق الإعلاني *
-                          </label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-white placeholder-gray-400"
-                            value={formData.totalAdSpend}
-                            onChange={(e) => handleInputChange('totalAdSpend', e.target.value)}
-                            placeholder="10000"
-                            min="0"
-                            step="100"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <Users className="w-4 h-4 text-blue-400" />
-                            تكاليف فريق التسويق
-                          </label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-white placeholder-gray-400"
-                            value={formData.marketingTeamCosts}
-                            onChange={(e) => handleInputChange('marketingTeamCosts', e.target.value)}
-                            placeholder="5000"
-                            min="0"
-                            step="100"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                          <BarChart3 className="w-4 h-4 text-blue-400" />
-                          التكاليف العامة (overhead)
-                        </label>
-                        <input
-                          type="number"
-                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-white placeholder-gray-400"
-                          value={formData.overheadCosts}
-                          onChange={(e) => handleInputChange('overheadCosts', e.target.value)}
-                          placeholder="2000"
-                          min="0"
-                          step="100"
+                        <FlexibleInput
+                          label="إجمالي الإنفاق الإعلاني"
+                          value={formData.totalAdSpend}
+                          onChange={(value) => handleInputChange('totalAdSpend', value)}
+                          type="currency"
+                          placeholder="10000"
+                          required
+                          language="ar"
+                        />
+                        
+                        <FlexibleInput
+                          label="تكاليف فريق التسويق"
+                          value={formData.marketingTeamCosts}
+                          onChange={(value) => handleInputChange('marketingTeamCosts', value)}
+                          type="currency"
+                          placeholder="5000"
+                          language="ar"
                         />
                       </div>
+                      
+                      <FlexibleInput
+                        label="التكاليف العامة (overhead)"
+                        value={formData.overheadCosts}
+                        onChange={(value) => handleInputChange('overheadCosts', value)}
+                        type="currency"
+                        placeholder="2000"
+                        language="ar"
+                      />
                     </div>
 
                     {/* Sales Costs */}
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-purple-400 mb-3">التكاليف البيعية</h3>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                          <Target className="w-4 h-4 text-purple-400" />
-                          تكاليف فريق المبيعات
-                        </label>
-                        <input
-                          type="number"
-                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400"
-                          value={formData.salesTeamCosts}
-                          onChange={(e) => handleInputChange('salesTeamCosts', e.target.value)}
-                          placeholder="8000"
-                          min="0"
-                          step="100"
-                        />
-                      </div>
+                      <FlexibleInput
+                        label="تكاليف فريق المبيعات"
+                        value={formData.salesTeamCosts}
+                        onChange={(value) => handleInputChange('salesTeamCosts', value)}
+                        type="currency"
+                        placeholder="8000"
+                        language="ar"
+                      />
                     </div>
 
                     {/* Results */}
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-green-400 mb-3">النتائج</h3>
                       <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <Users className="w-4 h-4 text-green-400" />
-                            إجمالي العملاء المحتملين (Leads) *
-                          </label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300 text-white placeholder-gray-400"
-                            value={formData.totalLeads}
-                            onChange={(e) => handleInputChange('totalLeads', e.target.value)}
-                            placeholder="500"
-                            min="0"
-                            step="1"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <Award className="w-4 h-4 text-green-400" />
-                            إجمالي العملاء *
-                          </label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300 text-white placeholder-gray-400"
-                            value={formData.totalCustomers}
-                            onChange={(e) => handleInputChange('totalCustomers', e.target.value)}
-                            placeholder="50"
-                            min="0"
-                            step="1"
-                            required
-                          />
-                        </div>
+                        <FlexibleInput
+                          label="إجمالي العملاء المحتملين (Leads)"
+                          value={formData.totalLeads}
+                          onChange={(value) => handleInputChange('totalLeads', value)}
+                          type="number"
+                          placeholder="500"
+                          required
+                          language="ar"
+                        />
+                        
+                        <FlexibleInput
+                          label="إجمالي العملاء"
+                          value={formData.totalCustomers}
+                          onChange={(value) => handleInputChange('totalCustomers', value)}
+                          type="number"
+                          placeholder="50"
+                          required
+                          language="ar"
+                        />
                       </div>
+                    </div>
+
+                    {/* Additional Info */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-yellow-400 mb-3">معلومات إضافية</h3>
                       <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-green-400" />
-                            متوسط قيمة العميل
-                          </label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300 text-white placeholder-gray-400"
-                            value={formData.avgCustomerValue}
-                            onChange={(e) => handleInputChange('avgCustomerValue', e.target.value)}
-                            placeholder="1000"
-                            min="0"
-                            step="10"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <Activity className="w-4 h-4 text-green-400" />
-                            الفترة الزمنية
-                          </label>
-                          <select
-                            value={formData.timePeriod}
-                            onChange={(e) => handleInputChange('timePeriod', e.target.value)}
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300 text-white"
-                          >
-                            {timePeriods.map((period) => (
-                              <option key={period.value} value={period.value}>
-                                {period.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                        <FlexibleInput
+                          label="متوسط قيمة العميل"
+                          value={formData.avgCustomerValue}
+                          onChange={(value) => handleInputChange('avgCustomerValue', value)}
+                          type="currency"
+                          placeholder="1500"
+                          language="ar"
+                        />
+                        
+                        <FlexibleInput
+                          label="الصناعة"
+                          value={formData.industry}
+                          onChange={(value) => handleInputChange('industry', value)}
+                          type="text"
+                          options={industries}
+                          language="ar"
+                        />
                       </div>
                     </div>
 
@@ -426,133 +457,69 @@ export default function CACCalculatorArabic() {
                     </div>
                   </form>
                 ) : (
-                  <div className="space-y-6">
-                    <div className="text-center">
-                      <h3 className="text-2xl font-bold text-white mb-4">نتائج تكلفة اكتساب العملاء</h3>
-                      <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-300 px-4 py-2 rounded-full">
-                        <CheckCircle className="w-4 h-4" />
-                        <span className="text-sm font-medium">تم الحساب بنجاح</span>
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <Card className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border-blue-500/30">
-                        <CardContent className="p-6 text-center">
-                          <div className="text-3xl font-bold text-white mb-2">{formatCurrency(results.cac)}</div>
-                          <div className="text-sm text-gray-300">تكلفة اكتساب العميل (CAC)</div>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500/30">
-                        <CardContent className="p-6 text-center">
-                          <div className="text-3xl font-bold text-white mb-2">{results.leadToCustomerRate}%</div>
-                          <div className="text-sm text-gray-300">معدل تحويل العميل</div>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-green-500/30">
-                        <CardContent className="p-6 text-center">
-                          <div className="text-3xl font-bold text-white mb-2">{formatCurrency(results.costPerLead)}</div>
-                          <div className="text-sm text-gray-300">تكلفة العميل المحتمل</div>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-gradient-to-br from-orange-500/20 to-red-500/20 border-orange-500/30">
-                        <CardContent className="p-6 text-center">
-                          <div className="text-3xl font-bold text-white mb-2">{results.roi}%</div>
-                          <div className="text-sm text-gray-300">العائد على الاستثمار</div>
-                        </CardContent>
-                      </Card>
-                    </div>
-
-                    <div className="text-center">
-                      <Button
-                        onClick={() => setResults(null)}
-                        variant="outline"
-                        className="border-white/20 text-white hover:bg-white/10"
-                      >
-                        <RefreshCw className="w-4 h-4 ml-2" />
-                        حساب جديد
-                      </Button>
-                    </div>
+                  <div className="text-center py-8">
+                    <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-white mb-2">
+                      تم حساب تكلفة اكتساب العملاء بنجاح
+                    </h3>
+                    <p className="text-gray-400">
+                      يمكنك عرض النتائج التفصيلية في الجانب الأيمن أو إعادة تعيين النموذج لحساب جديد
+                    </p>
                   </div>
                 )}
               </CardContent>
             </Card>
           </motion.div>
 
-          {/* Results Panel */}
+          {/* Results */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="space-y-6"
+            className="lg:col-span-1"
           >
             {results && (
+              <EnhancedResultsDisplay
+                title="تحليل تكلفة اكتساب العملاء"
+                results={results}
+                language="ar"
+                toolType="cac-calculator"
+              />
+            )}
+
+            {!results && (
               <Card className="bg-white/5 backdrop-blur-md border-white/10 shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-blue-400" />
-                    التحليل والتوصيات
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {results.strengths.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium text-green-400 mb-2">نقاط القوة:</h4>
-                      <ul className="space-y-1">
-                        {results.strengths.map((strength: string, index: number) => (
-                          <li key={index} className="text-sm text-gray-300 flex items-center gap-2">
-                            <CheckCircle className="w-3 h-3 text-green-400" />
-                            {strength}
-                          </li>
-                        ))}
-                      </ul>
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Users className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    جاهز لحساب CAC
+                  </h3>
+                  <p className="text-gray-400 mb-6">
+                    أدخل بيانات تسويقك ومبيعاتك واحصل على تحليل مفصل لتكلفة اكتساب العملاء والتوصيات الذكية
+                  </p>
+                  <div className="space-y-3 text-left">
+                    <div className="flex items-center gap-3 text-sm text-gray-300">
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <span>تحليل شامل لتكاليف الاكتساب</span>
                     </div>
-                  )}
-                  
-                  {results.recommendations.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium text-yellow-400 mb-2">التوصيات:</h4>
-                      <ul className="space-y-1">
-                        {results.recommendations.map((recommendation: string, index: number) => (
-                          <li key={index} className="text-sm text-gray-300 flex items-center gap-2">
-                            <AlertCircle className="w-3 h-3 text-yellow-400" />
-                            {recommendation}
-                          </li>
-                        ))}
-                      </ul>
+                    <div className="flex items-center gap-3 text-sm text-gray-300">
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <span>تقييم كفاءة التحويل</span>
                     </div>
-                  )}
+                    <div className="flex items-center gap-3 text-sm text-gray-300">
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <span>توصيات ذكية مخصصة</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-gray-300">
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <span>تصدير النتائج بصيغ متعددة</span>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             )}
-
-            <Card className="bg-white/5 backdrop-blur-md border-white/10 shadow-2xl">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
-                  <PieChart className="w-5 h-5 text-blue-400" />
-                  نصائح احترافية
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="text-sm text-gray-300">
-                  <div className="flex items-start gap-2 mb-2">
-                    <Zap className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
-                    <span>ركز على تحسين جودة العملاء المحتملين وليس الكمية فقط</span>
-                  </div>
-                  <div className="flex items-start gap-2 mb-2">
-                    <Target className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                    <span>استخدم استهدافاً دقيقاً للوصول إلى العملاء المناسبين</span>
-                  </div>
-                  <div className="flex items-start gap-2 mb-2">
-                    <TrendingUp className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-                    <span>تابع CAC بانتظام لقياس كفاءة حملاتك التسويقية</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Award className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
-                    <span>وازن بين تكاليف التسويق والمبيعات للحصول على أفضل النتائج</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </motion.div>
         </div>
       </div>

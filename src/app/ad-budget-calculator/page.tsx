@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '@/components/Navigation'
+import FlexibleInput from '@/components/ui/FlexibleInput'
+import EnhancedResultsDisplay from '@/components/ui/EnhancedResultsDisplay'
 import { 
   Calculator, 
   TrendingUp, 
@@ -184,6 +186,56 @@ export default function AdBudgetCalculator() {
     }).format(num)
   }
 
+  const getExportData = () => {
+    if (!results) return null
+
+    return {
+      title: 'Ad Budget Analysis Report',
+      date: new Date().toLocaleDateString(),
+      sections: [
+        {
+          title: 'Budget Overview',
+          data: [
+            { label: 'Total Marketing Budget', value: formatCurrency(results.totalMarketingBudget) },
+            { label: 'Ad Budget', value: formatCurrency(results.adBudget) },
+            { label: 'Monthly Ad Budget', value: formatCurrency(results.monthlyAdBudget) },
+            { label: 'Daily Ad Budget', value: formatCurrency(results.dailyAdBudget) },
+            { label: 'Campaign Budget', value: formatCurrency(results.campaignAdBudget) }
+          ]
+        },
+        {
+          title: 'Performance Targets',
+          data: [
+            { label: 'Target Revenue', value: formatCurrency(results.targetRevenue) },
+            { label: 'Target Orders', value: results.targetOrders },
+            { label: 'Target Visitors', value: results.targetVisitors },
+            { label: 'Cost Per Order', value: formatCurrency(results.costPerOrder) },
+            { label: 'Cost Per Visitor', value: formatCurrency(results.costPerVisitor) }
+          ]
+        },
+        {
+          title: 'Channel Allocation',
+          data: [
+            { label: 'Facebook', value: formatCurrency(results.channelAllocation.facebook) },
+            { label: 'Google', value: formatCurrency(results.channelAllocation.google) },
+            { label: 'Instagram', value: formatCurrency(results.channelAllocation.instagram) },
+            { label: 'LinkedIn', value: formatCurrency(results.channelAllocation.linkedin) },
+            { label: 'Other', value: formatCurrency(results.channelAllocation.other) }
+          ]
+        },
+        {
+          title: 'Analysis',
+          data: [
+            { label: 'Overall Score', value: `${results.overallScore}/100` },
+            { label: 'Performance Rating', value: getScoreLabel(parseFloat(results.overallScore)) }
+          ]
+        }
+      ],
+      strengths: results.strengths,
+      recommendations: results.recommendations
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white overflow-hidden relative">
       {/* Animated Background Elements */}
@@ -234,94 +286,65 @@ export default function AdBudgetCalculator() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Business Metrics */}
                   <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-orange-400" />
-                        Total Annual Revenue *
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-white placeholder-gray-400"
-                        value={formData.totalRevenue}
-                        onChange={(e) => handleInputChange('totalRevenue', e.target.value)}
-                        placeholder="1000000"
-                        min="0"
-                        step="10000"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <Percent className="w-4 h-4 text-orange-400" />
-                        Marketing Budget (%) *
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-white placeholder-gray-400"
-                        value={formData.marketingBudgetPercent}
-                        onChange={(e) => handleInputChange('marketingBudgetPercent', e.target.value)}
-                        placeholder="15"
-                        min="0"
-                        max="100"
-                        step="1"
-                        required
-                      />
-                    </div>
+                    <FlexibleInput
+                      label="Total Annual Revenue"
+                      type="currency"
+                      value={formData.totalRevenue}
+                      onChange={(value) => handleInputChange('totalRevenue', value)}
+                      options={['500000', '1000000', '2000000', '5000000', '10000000']}
+                      placeholder="1000000"
+                      required={true}
+                      language="en"
+                    />
+                    
+                    <FlexibleInput
+                      label="Marketing Budget (%)"
+                      type="percentage"
+                      value={formData.marketingBudgetPercent}
+                      onChange={(value) => handleInputChange('marketingBudgetPercent', value)}
+                      options={['5', '10', '15', '20', '25']}
+                      placeholder="15"
+                      required={true}
+                      language="en"
+                    />
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <Target className="w-4 h-4 text-orange-400" />
-                        Target ROAS *
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-white placeholder-gray-400"
-                        value={formData.targetROAS}
-                        onChange={(e) => handleInputChange('targetROAS', e.target.value)}
-                        placeholder="3"
-                        min="0"
-                        step="0.1"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <BarChart3 className="w-4 h-4 text-orange-400" />
-                        Average Order Value *
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-white placeholder-gray-400"
-                        value={formData.averageOrderValue}
-                        onChange={(e) => handleInputChange('averageOrderValue', e.target.value)}
-                        placeholder="150"
-                        min="0"
-                        step="10"
-                        required
-                      />
-                    </div>
+                    <FlexibleInput
+                      label="Target ROAS"
+                      type="number"
+                      value={formData.targetROAS}
+                      onChange={(value) => handleInputChange('targetROAS', value)}
+                      options={['2', '3', '4', '5', '6']}
+                      placeholder="3"
+                      required={true}
+                      language="en"
+                    />
+                    
+                    <FlexibleInput
+                      label="Average Order Value"
+                      type="currency"
+                      value={formData.averageOrderValue}
+                      onChange={(value) => handleInputChange('averageOrderValue', value)}
+                      options={['50', '100', '150', '200', '250']}
+                      placeholder="150"
+                      required={true}
+                      language="en"
+                    />
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-orange-400" />
-                        Conversion Rate (%) *
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all duration-300 text-white placeholder-gray-400"
-                        value={formData.conversionRate}
-                        onChange={(e) => handleInputChange('conversionRate', e.target.value)}
-                        placeholder="2.5"
-                        min="0"
-                        max="100"
-                        step="0.1"
-                        required
-                      />
-                    </div>
+                    <FlexibleInput
+                      label="Conversion Rate (%)"
+                      type="percentage"
+                      value={formData.conversionRate}
+                      onChange={(value) => handleInputChange('conversionRate', value)}
+                      options={['1', '2', '2.5', '3', '5']}
+                      placeholder="2.5"
+                      required={true}
+                      language="en"
+                    />
+                    
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
                         <Clock className="w-4 h-4 text-orange-400" />
@@ -417,289 +440,125 @@ export default function AdBudgetCalculator() {
                   </button>
                 </form>
               ) : (
-                /* Results Section */
-                <div className="space-y-8">
-                  {/* Overall Score */}
-                  <div className="text-center">
-                    <div className="mb-6">
-                      <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Award className="w-10 h-10 text-white" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-white mb-2">Budget Analysis Complete</h3>
-                      <p className="text-gray-300">Your optimal ad budget breakdown</p>
-                    </div>
-
-                    <div className="mb-6">
-                      <div className="text-6xl font-bold mb-2">
-                        <span className={getScoreColor(parseFloat(results.overallScore))}>{results.overallScore}</span>
-                        <span className="text-gray-400 text-3xl">/100</span>
-                      </div>
-                      <div className={`text-xl font-semibold mb-4 ${getScoreColor(parseFloat(results.overallScore))}`}>
-                        {getScoreLabel(parseFloat(results.overallScore))} Performance
-                      </div>
-                      <div className="w-full bg-white/10 rounded-full h-3">
-                        <div 
-                          className={`h-3 rounded-full transition-all duration-1000 ${
-                            parseFloat(results.overallScore) >= 80 ? 'bg-green-500' :
-                            parseFloat(results.overallScore) >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-                          }`}
-                          style={{ width: `${results.overallScore}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Key Metrics */}
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-gradient-to-br from-orange-500/20 to-orange-600/20 p-4 rounded-xl border border-orange-500/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <DollarSign className="w-4 h-4 text-orange-400" />
-                        <span className="text-sm text-orange-300">Ad Budget</span>
-                      </div>
-                      <div className="text-2xl font-bold text-white">{formatCurrency(results.adBudget)}</div>
-                      <div className="text-xs text-gray-400">Annual Budget</div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-amber-500/20 to-amber-600/20 p-4 rounded-xl border border-amber-500/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Clock className="w-4 h-4 text-amber-400" />
-                        <span className="text-sm text-amber-300">Monthly Budget</span>
-                      </div>
-                      <div className="text-2xl font-bold text-white">{formatCurrency(results.monthlyAdBudget)}</div>
-                      <div className="text-xs text-gray-400">Per Month</div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 p-4 rounded-xl border border-yellow-500/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Target className="w-4 h-4 text-yellow-400" />
-                        <span className="text-sm text-yellow-300">Campaign Budget</span>
-                      </div>
-                      <div className="text-2xl font-bold text-white">{formatCurrency(results.campaignAdBudget)}</div>
-                      <div className="text-xs text-gray-400">For {formData.campaignDuration} days</div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-red-500/20 to-red-600/20 p-4 rounded-xl border border-red-500/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <TrendingUp className="w-4 h-4 text-red-400" />
-                        <span className="text-sm text-red-300">Target Revenue</span>
-                      </div>
-                      <div className="text-2xl font-bold text-white">{formatCurrency(results.targetRevenue)}</div>
-                      <div className="text-xs text-gray-400">Expected Revenue</div>
-                    </div>
-                  </div>
-
-                  {/* Channel Allocation */}
-                  <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-                    <h4 className="text-lg font-semibold text-white mb-4">Channel Budget Allocation</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-400 mb-1">{formatCurrency(results.channelAllocation.facebook)}</div>
-                        <div className="text-sm text-gray-400">Facebook</div>
-                        <div className="w-full bg-white/10 rounded-full h-2 mt-2">
-                          <div className="bg-blue-500 h-2 rounded-full" style={{ width: '35%' }}></div>
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-red-400 mb-1">{formatCurrency(results.channelAllocation.google)}</div>
-                        <div className="text-sm text-gray-400">Google</div>
-                        <div className="w-full bg-white/10 rounded-full h-2 mt-2">
-                          <div className="bg-red-500 h-2 rounded-full" style={{ width: '30%' }}></div>
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-purple-400 mb-1">{formatCurrency(results.channelAllocation.instagram)}</div>
-                        <div className="text-sm text-gray-400">Instagram</div>
-                        <div className="w-full bg-white/10 rounded-full h-2 mt-2">
-                          <div className="bg-purple-500 h-2 rounded-full" style={{ width: '20%' }}></div>
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-cyan-400 mb-1">{formatCurrency(results.channelAllocation.linkedin)}</div>
-                        <div className="text-sm text-gray-400">LinkedIn</div>
-                        <div className="w-full bg-white/10 rounded-full h-2 mt-2">
-                          <div className="bg-cyan-500 h-2 rounded-full" style={{ width: '10%' }}></div>
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-gray-400 mb-1">{formatCurrency(results.channelAllocation.other)}</div>
-                        <div className="text-sm text-gray-400">Other</div>
-                        <div className="w-full bg-white/10 rounded-full h-2 mt-2">
-                          <div className="bg-gray-500 h-2 rounded-full" style={{ width: '5%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Performance Metrics */}
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                      <div className="text-sm text-gray-400 mb-1">Target Orders</div>
-                      <div className="text-xl font-bold text-white">{results.targetOrders}</div>
-                    </div>
-                    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                      <div className="text-sm text-gray-400 mb-1">Target Visitors</div>
-                      <div className="text-xl font-bold text-white">{results.targetVisitors}</div>
-                    </div>
-                    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                      <div className="text-sm text-gray-400 mb-1">Cost Per Order</div>
-                      <div className="text-xl font-bold text-white">{formatCurrency(results.costPerOrder)}</div>
-                    </div>
-                  </div>
-
-                  {/* Strengths and Recommendations */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6">
-                      <h4 className="text-lg font-semibold text-green-400 mb-4 flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5" />
-                        Strengths
-                      </h4>
-                      <ul className="space-y-2">
-                        {results.strengths.map((strength: string, index: number) => (
-                          <li key={index} className="flex items-start gap-2 text-green-300">
-                            <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <span className="text-sm">{strength}</span>
-                          </li>
-                        ))}
-                        {results.strengths.length === 0 && (
-                          <li className="text-gray-400 text-sm">No significant strengths identified</li>
-                        )}
-                      </ul>
-                    </div>
-
-                    <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-6">
-                      <h4 className="text-lg font-semibold text-blue-400 mb-4 flex items-center gap-2">
-                        <AlertCircle className="w-5 h-5" />
-                        Recommendations
-                      </h4>
-                      <ul className="space-y-2">
-                        {results.recommendations.map((rec: string, index: number) => (
-                          <li key={index} className="flex items-start gap-2 text-blue-300">
-                            <ArrowRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <span className="text-sm">{rec}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4 justify-center">
-                    <button
-                      onClick={() => {
-                        setResults(null)
-                        setFormData({
-                          totalRevenue: '',
-                          marketingBudgetPercent: '',
-                          targetROAS: '',
-                          averageOrderValue: '',
-                          conversionRate: '',
-                          campaignDuration: '30',
-                          industry: '',
-                          businessGoal: ''
-                        })
-                      }}
-                      className="px-6 py-3 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-all duration-300"
-                    >
-                      New Calculation
-                    </button>
-                    <button 
-                      onClick={() => {
-                        // Generate and download ad budget report
-                        const reportData = {
-                          type: 'Ad Budget Analysis',
-                          date: new Date().toLocaleDateString(),
-                          results: results
-                        }
-                        const dataStr = JSON.stringify(reportData, null, 2)
-                        const dataBlob = new Blob([dataStr], {type: 'application/json'})
-                        const url = URL.createObjectURL(dataBlob)
-                        const link = document.createElement('a')
-                        link.href = url
-                        link.download = 'ad-budget-analysis-report.json'
-                        link.click()
-                        URL.revokeObjectURL(url)
-                      }}
-                      className="px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 flex items-center gap-2"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download Report
-                    </button>
-                  </div>
-                </div>
+                <EnhancedResultsDisplay
+                  results={results}
+                  onReset={() => {
+                    setResults(null)
+                    setFormData({
+                      totalRevenue: '',
+                      marketingBudgetPercent: '',
+                      targetROAS: '',
+                      averageOrderValue: '',
+                      conversionRate: '',
+                      campaignDuration: '30',
+                      industry: '',
+                      businessGoal: ''
+                    })
+                  }}
+                  exportData={getExportData()}
+                  title="Ad Budget Analysis"
+                  getScoreColor={getScoreColor}
+                  getScoreLabel={getScoreLabel}
+                  formatCurrency={formatCurrency}
+                  colorScheme="orange"
+                />
               )}
             </div>
           </motion.div>
 
-          {/* Sidebar Info */}
+          {/* Info Panel */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="space-y-6"
+            className="lg:col-span-1"
           >
-            <div className="bg-gradient-to-br from-orange-500/20 to-amber-500/20 p-6 rounded-3xl border border-orange-500/30 backdrop-blur-md">
-              <h3 className="text-xl font-bold text-white mb-4">Budget Planning</h3>
-              <div className="space-y-4">
-                <div className="p-3 bg-white/5 rounded-lg">
-                  <h4 className="font-semibold text-orange-300 mb-1">Optimal Budget Range</h4>
-                  <p className="text-xs text-gray-300">Most businesses allocate 10-20% of revenue to marketing, with 60-80% of that going to paid advertising.</p>
-                </div>
-                <div className="p-3 bg-white/5 rounded-lg">
-                  <h4 className="font-semibold text-amber-300 mb-1">Channel Allocation</h4>
-                  <p className="text-xs text-gray-300">Distribute budget across channels based on performance, audience, and business goals.</p>
-                </div>
-                <div className="p-3 bg-white/5 rounded-lg">
-                  <h4 className="font-semibold text-yellow-300 mb-1">Budget Optimization</h4>
-                  <p className="text-xs text-gray-300">Regular review and adjustment of budget allocation ensures maximum ROI and efficiency.</p>
+            <div className="space-y-6">
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <Target className="w-5 h-5 text-orange-400" />
+                  How to Use
+                </h3>
+                <ul className="space-y-3 text-sm text-gray-300">
+                  <li className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                    Enter your annual revenue and marketing budget percentage
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                    Set realistic ROAS targets and conversion rates
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                    Choose campaign duration for specific calculations
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                    Review channel allocation recommendations
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-orange-400" />
+                  Key Metrics
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm text-gray-400">Ad Budget</span>
+                      <span className="text-xs text-orange-400">70% of marketing budget</span>
+                    </div>
+                    <div className="w-full bg-white/10 rounded-full h-2">
+                      <div className="bg-orange-500 h-2 rounded-full" style={{ width: '70%' }}></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm text-gray-400">Target ROAS</span>
+                      <span className="text-xs text-orange-400">Industry average: 3-4x</span>
+                    </div>
+                    <div className="w-full bg-white/10 rounded-full h-2">
+                      <div className="bg-amber-500 h-2 rounded-full" style={{ width: '75%' }}></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm text-gray-400">Channel Diversification</span>
+                      <span className="text-xs text-orange-400">5 channels recommended</span>
+                    </div>
+                    <div className="w-full bg-white/10 rounded-full h-2">
+                      <div className="bg-yellow-500 h-2 rounded-full" style={{ width: '85%' }}></div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 p-6 rounded-3xl border border-green-500/30 backdrop-blur-md">
-              <h3 className="text-xl font-bold text-white mb-4">Industry Standards</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-300">E-commerce</span>
-                  <span className="text-sm font-semibold text-green-400">15-25%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-300">SaaS</span>
-                  <span className="text-sm font-semibold text-green-400">20-35%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-300">B2B Services</span>
-                  <span className="text-sm font-semibold text-green-400">10-20%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-300">Local Business</span>
-                  <span className="text-sm font-semibold text-green-400">5-15%</span>
+              <div className="bg-gradient-to-br from-orange-500/20 to-amber-500/20 rounded-2xl p-6 border border-orange-500/30">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <Award className="w-5 h-5 text-orange-400" />
+                  Pro Tips
+                </h3>
+                <div className="space-y-3 text-sm text-orange-100">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-300" />
+                    <span>Allocate 10-20% of revenue to marketing for optimal growth</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-300" />
+                    <span>Target ROAS of 3-4x for healthy campaign performance</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-300" />
+                    <span>Diversify across multiple channels to reduce risk</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-300" />
+                    <span>Monitor and adjust budgets based on performance data</span>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 p-6 rounded-3xl border border-purple-500/30 backdrop-blur-md">
-              <h3 className="text-xl font-bold text-white mb-4">Best Practices</h3>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2 text-purple-300">
-                  <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>Start with conservative budgets</span>
-                </li>
-                <li className="flex items-start gap-2 text-purple-300">
-                  <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>Scale based on performance data</span>
-                </li>
-                <li className="flex items-start gap-2 text-purple-300">
-                  <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>Diversify across multiple channels</span>
-                </li>
-                <li className="flex items-start gap-2 text-purple-300">
-                  <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>Monitor and adjust weekly</span>
-                </li>
-                <li className="flex items-start gap-2 text-purple-300">
-                  <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>Focus on high-ROAS channels</span>
-                </li>
-              </ul>
             </div>
           </motion.div>
         </div>

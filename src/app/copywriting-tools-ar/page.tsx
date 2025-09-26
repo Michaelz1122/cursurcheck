@@ -3,90 +3,47 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '@/components/Navigation'
-import RTLWrapper from '@/components/RTLWrapper'
-import ToolOutput from '@/components/ToolOutput'
+import FlexibleInput from '@/components/ui/FlexibleInput'
+import EnhancedResultsDisplay from '@/components/ui/EnhancedResultsDisplay'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { 
-  PenTool, 
+  Edit, 
   FileText, 
   MessageSquare, 
   Hash, 
-  Target, 
-  Users, 
-  TrendingUp, 
-  Lightbulb,
+  Mail, 
   Copy,
   Download,
   RefreshCw,
   CheckCircle,
+  Lightbulb,
+  Target,
+  Users,
   Zap,
-  Star,
   ArrowRight,
-  Loader2
+  Clock
 } from 'lucide-react'
 
-
-export default function CopywritingToolsArabic() {
-  const [activeTab, setActiveTab] = useState('ad-copy')
+export default function CopywritingToolsAR() {
   const [formData, setFormData] = useState({
     product: '',
     audience: '',
     tone: 'professional',
-    length: 'medium',
     keyPoints: '',
     cta: ''
   })
   const [generatedCopy, setGeneratedCopy] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
-  const [metrics, setMetrics] = useState<any[]>([])
-  const [recommendations, setRecommendations] = useState<string[]>([])
-  const [score, setScore] = useState<number | undefined>(undefined)
+  const [activeTool, setActiveTool] = useState('headlines')
+  const [results, setResults] = useState<any>(null)
 
-  const copywritingTools = [
-    {
-      id: 'ad-copy',
-      title: 'مولد نصوص الإعلانات',
-      description: 'إنشاء نصوص إعلانية جذابة لوسائل التواصل الاجتماعي وحملات البحث',
-      icon: PenTool,
-      color: 'from-purple-500 to-pink-500'
-    },
-    {
-      id: 'headlines',
-      title: 'مولد العناوين',
-      description: 'إنشاء عناوين تجذب الانتباه لمحتواك',
-      icon: FileText,
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      id: 'social-posts',
-      title: 'مولد منشورات التواصل',
-      description: 'إنشاء منشورات جذابة لمنصات التواصل الاجتماعي',
-      icon: MessageSquare,
-      color: 'from-green-500 to-emerald-500'
-    },
-    {
-      id: 'hashtags',
-      title: 'مولد الهاشتاجات',
-      description: 'إنشاء هاشتاجات فعالة لزيادة الوصول والمشاركة',
-      icon: Hash,
-      color: 'from-orange-500 to-red-500'
-    },
-    {
-      id: 'email-subjects',
-      title: 'مولد مواضيع البريد',
-      description: 'إنشاء مواضيع بريد إلكتروني تجذب الانفتاح والنقر',
-      icon: Target,
-      color: 'from-yellow-500 to-amber-500'
-    },
-    {
-      id: 'product-descriptions',
-      title: 'مولد أوصاف المنتجات',
-      description: 'إنشاء أوصاف منتجات مقنعة تزيد من المبيعات',
-      icon: Users,
-      color: 'from-indigo-500 to-purple-500'
-    }
+  const tools = [
+    { id: 'headlines', title: 'عناوين جذابة', icon: Edit, color: 'from-purple-500 to-pink-500' },
+    { id: 'social-posts', title: 'منشورات تواصل اجتماعي', icon: MessageSquare, color: 'from-blue-500 to-cyan-500' },
+    { id: 'email-subjects', title: 'عناوين البريد الإلكتروني', icon: Mail, color: 'from-green-500 to-emerald-500' },
+    { id: 'hashtags', title: 'هاشتاجات', icon: Hash, color: 'from-orange-500 to-red-500' }
   ]
 
   const toneOptions = [
@@ -97,71 +54,32 @@ export default function CopywritingToolsArabic() {
     { value: 'humorous', label: 'مرح' }
   ]
 
-  const lengthOptions = [
-    { value: 'short', label: 'قصير' },
-    { value: 'medium', label: 'متوسط' },
-    { value: 'long', label: 'طويل' }
-  ]
-
-  const generateAdCopy = () => {
-    const toneText = {
-      professional: 'احترافي',
-      casual: 'ودود',
-      urgent: 'عاجل',
-      emotional: 'عاطفي',
-      humorous: 'مرح'
-    }[formData.tone]
-
-    return `🎯 **نص إعلاني احترافي لـ ${formData.product}**
-
-**الجمهور المستهدف:** ${formData.audience}
-**نبرة الصوت:** ${toneText}
-
----
-
-### 🔥 **النص الرئيسي:**
-اكتشف ${formData.product} - الحل الأمثل لجميع احتياجاتك! منتجنا المبتكر مصمم خصيصاً لـ ${formData.audience}، يوفر لك تجربة استثنائية لا تضاهى.
-
-${formData.keyPoints ? `### ✨ **المميزات الرئيسية:**
-${formData.keyPoints.split('\n').map(point => `• ${point.trim()}`).join('\n')}` : ''}
-
-### 💎 **لماذا تختارنا؟**
-• جودة عالية مضمونة
-• أسعار تنافسية تبدأ من 500 ج.م
-• خدمة عملاء على مدار الساعة
-• توصيل سريع لجميع المحافظات
-
-### 🚀 **عرض خاص:**
-احصل على خصم 20% عند الشراء الآن! الفرصة محدودة.
-
-${formData.cta ? `### 👆 **دعوة للعمل:**
-${formData.cta}` : '### 👆 **دعوة للعمل:**\nاطلب الآن واستمتع بأفضل تجربة!'}
-
----
-📞 **للاستفسار:** 0123456789
-🌐 **الموقع:** www.example.com
-#تخفيضات #عروض_خاصة #جودة_عالية`
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
   }
 
   const generateHeadlines = () => {
-    return `📰 **عناوين جذابة لـ ${formData.product}**
+    const headlines = [
+      `📰 **عناوين جذابة لـ ${formData.product}**`,
+      '',
+      '### 🔥 **العناوين الرئيسية:**',
+      `1. ${formData.product}: الحل الذي كنت تنتظره!`,
+      `2. اكتشف سر التميز مع ${formData.product}`,
+      `3. ${formData.product} - ثورة في عالم ${formData.audience}`,
+      `4. لماذا يختار الجميع ${formData.product}؟`,
+      `5. ${formData.product}: الاستثمار الذكي لمستقبلك`,
+      '',
+      '### 💡 **عناوين ثانوية:**',
+      `• لا تفوت فرصة الحصول على ${formData.product}`,
+      `• ${formData.product} - الجودة التي تستحقها`,
+      `• تجربة لا تُنسى مع ${formData.product}`,
+      `• ${formData.product}: ابتسامة رضا مضمونة`,
+      `• اكتشف الفرق مع ${formData.product}`,
+      '',
+      '#عناوين_جذابة #تسويق #إعلانات'
+    ].join('\n')
 
-### 🔥 **العناوين الرئيسية:**
-1. ${formData.product}: الحل الذي كنت تنتظره!
-2. اكتشف سر التميز مع ${formData.product}
-3. ${formData.product} - ثورة في عالم ${formData.audience}
-4. لماذا يختار الجميع ${formData.product}؟
-5. ${formData.product}: الاستثمار الذكي لمستقبلك
-
-### 💡 **عناوين ثانوية:**
-• لا تفوت فرصة الحصول على ${formData.product}
-• ${formData.product} - الجودة التي تستحقها
-• تجربة لا تُنسى مع ${formData.product}
-• ${formData.product}: ابتسامة رضا مضمونة
-• اكتشف الفرق مع ${formData.product}
-
----
-#عناوين_جذابة #تسويق #إعلانات`
+    return headlines
   }
 
   const generateSocialPosts = () => {
@@ -173,281 +91,191 @@ ${formData.cta}` : '### 👆 **دعوة للعمل:**\nاطلب الآن واس�
       humorous: 'مرح'
     }[formData.tone]
 
-    return `📱 **منشورات تواصل اجتماعي لـ ${formData.product}**
+    const socialPosts = [
+      `📱 **منشورات تواصل اجتماعي لـ ${formData.product}**`,
+      '',
+      '### 📸 **منشور إنستغرام:**',
+      `📷 ${formData.product}`,
+      '',
+      `اكتشف عالم الجديد مع ${formData.product}! 🌟 منتج مصمم خصيصاً لـ ${formData.audience} يوفر لك تجربة فريدة من نوعها.`,
+      '',
+      formData.keyPoints ? `✨ **المميزات:**\n${formData.keyPoints.split('\n').map(point => `• ${point.trim()}`).join('\n')}` : '',
+      '',
+      formData.cta ? `👆 ${formData.cta}` : '👆 راسلنا للمزيد من التفاصيل!',
+      '',
+      '#منتج_جديد #عروض #تخفيضات',
+      '',
+      '---',
+      '',
+      '### 💬 **منشور فيسبوك:**',
+      `🔥 **عرض خاص على ${formData.product}!** 🔥`,
+      '',
+      `الجمهور: ${formData.audience}`,
+      `النبرة: ${toneText}`,
+      '',
+      `${formData.product} هو الحل الأمثل الذي تبحث عنه. منتجنا يتميز بالجودة العالية والسعر التنافسي بدءاً من 500 ج.م.`,
+      '',
+      formData.cta ? `➡️ ${formData.cta}` : '➡️ اطلب الآن واحصل على خصم خاص!',
+      '',
+      '#عروض_خاصة #جودة #أسعار_مناسبة',
+      '',
+      '---',
+      '',
+      '### 🐦 **منشور تويتر:**',
+      `🚀 ${formData.product} - الحل الأمثل لـ ${formData.audience}!`,
+      '',
+      'جودة عالية ✓ أسعار تبدأ من 500 ج.م ✓ خدمة ممتازة ✓',
+      '',
+      formData.cta || 'اطلب الآن واستمتع بالتميز!',
+      '',
+      '#تخفيضات #عروض #جودة_عالية'
+    ].join('\n')
 
-### 📸 **منشور إنستجرام:**
-[${formData.product}]
-
-اكتشف عالم الجديد مع ${formData.product}! 🌟 منتج مصمم خصيصاً لـ ${formData.audience} يوفر لك تجربة فريدة من نوعها.
-
-${formData.keyPoints ? `✨ **المميزات:**
-${formData.keyPoints.split('\n').map(point => `• ${point.trim()}`).join('\n')}` : ''}
-
-${formData.cta ? `👆 ${formData.cta}` : '👆 راسلنا للمزيد من التفاصيل!'}
-
-#منتج_جديد #عروض #تخفيضات
-
----
-
-### 💬 **منشور فيسبوك:**
-🔥 **عرض خاص على ${formData.product}!** 🔥
-
-الجمهور: ${formData.audience}
-النبرة: ${toneText}
-
-${formData.product} هو الحل الأمثل الذي تبحث عنه. منتجنا يتميز بالجودة العالية والسعر التنافسي بدءاً من 500 ج.م.
-
-${formData.cta ? `➡️ ${formData.cta}` : '➡️ اطلب الآن واحصل على خصم خاص!'}
-
-#عروض_خاصة #جودة #أسعار_مناسبة
-
----
-
-### 🐦 **منشور تويتر:**
-🚀 ${formData.product} - الحل الأمثل لـ ${formData.audience}!
-
-جودة عالية ✓ أسعار تبدأ من 500 ج.م ✓ خدمة ممتازة ✓
-
-${formData.cta || 'اطلب الآن واستمتع بالتميز!'}
-
-#تخفيضات #عروض #جودة_عالية`
-  }
-
-  const generateHashtags = () => {
-    return `🏷️ **هاشتاجات فعالة لـ ${formData.product}**
-
-### 🔥 **الهاشتاجات الرئيسية:**
-#${formData.product.replace(/\s+/g, '_')}
-#${formData.audience.replace(/\s+/g, '_')}
-#تخفيضات
-#عروض_خاصة
-#جودة_عالية
-#أسعار_مناسبة
-#منتج_جديد
-#توصيل_سريع
-#خدمة_عملاء
-#رضا_عملاء
-
-### 💡 **هاشتاجات حسب الفئة:**
-**تجارية:**
-#تسويق_رقمي
-#أعمال_ناشئة
-#استثمار
-#نمو_الأعمال
-
-**اجتماعية:**
-#مجتمع
-#تواصل
-#مشاركة
-#تجارب
-#توصيات
-
-**عروضية:**
-#عروض_حصرية
-#تخفيضات_كبيرة
-#صفقات_رائعة
-#فرصة_ذهبية
-#عرض_لمدة_محدودة
-
-### 📊 **استراتيجية الهاشتاجات:**
-• استخدم 5-10 هاشتاجات لكل منشور
-• ركز على الهاشتاجات الأكثر صلة
-• اخلط بين العامة والخاصة
-• استخدم هاشتاجات عالية التفاعل
-• حدّث الهاشتاجات حسب المناسبات
-
----
-#هاشتاجات #تسويق #وسائل_تواصل_اجتماعي`
+    return socialPosts
   }
 
   const generateEmailSubjects = () => {
-    const toneText = {
-      professional: 'احترافي',
-      casual: 'ودود',
-      urgent: 'عاجل',
-      emotional: 'عاطفي',
-      humorous: 'مرح'
-    }[formData.tone]
+    const emailSubjects = [
+      `📧 **عناوين بريد إلكتروني لـ ${formData.product}**`,
+      '',
+      '### 🔥 **عناوين رئيسية:**',
+      `• 🎯 لا تفوت العرض الخاص على ${formData.product} - خصم 20% لفترة محدودة!`,
+      `• ✨ ${formData.product}: الحل الأمثل لـ ${formData.audience} موجود الآن!`,
+      `• 🚀 اكتشف لماذا يختار الجميع ${formData.product} - راجع التقييمات!`,
+      `• 💡 ${formData.product} - ثورة في عالم ${formData.audience} بأسعار تبدأ من 500 ج.م!`,
+      `• 🎁 عرض حصري: احصل على ${formData.product} مع هدية مجانية!`,
+      '',
+      '### 💼 **عناوين احترافية:**',
+      `• 📊 تحليل أداء ${formData.product} مقارنة بالمنتجات المنافسة`,
+      `• 🎯 ${formData.product}: الحل الاستراتيجي لـ ${formData.audience}`,
+      `• 💼 كيف يمكن لـ ${formData.product} أن يحسن كفاءة عملك بنسبة 80%؟`,
+      `• 📈 النتائج تتحدث: ${formData.product} يحصل على 4.8/5 من العملاء!`,
+      `• 🔍 دراسة شاملة: لماذا ${formData.product} هو الخيار الأفضل لـ ${formData.audience}؟`,
+      '',
+      '### ⚡ **عناوين عاجلة:**',
+      `• ⏰ العرض ينتهي بعد 24 ساعة فقط! ${formData.product} بخصم 25%!`,
+      `• 🔥 متبقي 10 قطع فقط من ${formData.product} - احجز الآن!`,
+      `• ⚡ خصم محدود: ${formData.product} بسعر 500 ج.م بدلاً من 1000 ج.م!`,
+      `• 🎁 هدية مجانية مع كل طلب ${formData.product} - اليوم فقط!`,
+      `• 🚨 آخر فرصة للحصول على ${formData.product} قبل نفاد الكمية!`,
+      '',
+      '#بريد_إلكتروني #تسويق #عروض'
+    ].join('\n')
 
-    return `📧 **مواضيع بريد إلكتروني لـ ${formData.product}**
-
-### 🔥 **مواضيع رئيسية (نقر عالي):**
-1. 🔥 عرض خاص: ${formData.product} بخصم 20% - محدود!
-2. 🎁 ${formData.product}: الهدية التي كنت تنتظرها
-3. ⚡ عاجل: آخر فرصة للحصول على ${formData.product}
-4. 💎 اكتشف لماذا الجميع يتحدث عن ${formData.product}
-5. 🌟 ${formData.product} - تغيير حقيقي لحياتك
-
-### 💡 **مواضيع ثانوية:**
-• لا تفوت ${formData.product} - الأسعار تبدأ من 500 ج.م
-• ${formData.product}: الجودة التي تستحقها الآن بخصم
-• رأي العملاء في ${formData.product} - 4.8/5 نجوم
-• كيف غير ${formData.product} حياة ${formData.audience}؟
-• ${formData.product}: الحل الأمثل لـ ${formData.audience}
-
-### 📊 **مواضيع حسب النبرة (${toneText}):**
-${formData.tone === 'professional' ? `• تحليل احترافي: ${formData.product} في السوق
-• تقرير مفصل عن مميزات ${formData.product}
-• ${formData.product}: الاستثمار الذكي لعملك` : 
-  formData.tone === 'casual' ? `• صديقنا ${formData.product} وصل! 🎉
-• جرب ${formData.product} وشاركنا رأيك
-• ${formData.product}: منتج رائع بسعر أروع` :
-  formData.tone === 'urgent' ? `⏰ آخر 24 ساعة لـ ${formData.product}!
-• عاجل: مخزون ${formData.product} ينفذ بسرعة
-• لا تنتظر! ${formData.product} بخصم محدود` :
-  formData.tone === 'emotional' ? `• ❤️ ${formData.product}: أكثر من مجرد منتج
-• كيف أثر ${formData.product} في حياة عملائنا
-• ${formData.product}: قصة نجاح تستحق المشاهدة` :
-  `• 😄 ${formData.product}: لأنك تستحق الابتسامة
-• ${formData.product}: المرح والجودة في منتج واحد
-• اضحك مع ${formData.product} واستمتع بالجودة`
-}
-
----
-#بريد_إلكتروني #تسويق #مواضيع_جذابة`
+    return emailSubjects
   }
 
-  const generateProductDescriptions = () => {
-    return `🛍️ **أوصاف منتجات مقنعة لـ ${formData.product}**
+  const generateHashtags = () => {
+    const hashtags = [
+      `🏷️ **هاشتاجات فعالة لـ ${formData.product}**`,
+      '',
+      '### 🔥 **الهاشتاجات الرئيسية:**',
+      `#${formData.product.replace(/\s+/g, '_')}`,
+      `#${formData.audience.replace(/\s+/g, '_')}`,
+      '#تخفيضات',
+      '#عروض_خاصة',
+      '#جودة_عالية',
+      '#أسعار_مناسبة',
+      '#منتج_جديد',
+      '#توصيل_سريع',
+      '#خدمة_عملاء',
+      '#رضا_عملاء',
+      '',
+      '### 💡 **هاشتاجات ثانوية:**',
+      `#${formData.product}_مميز`,
+      `#${formData.audience}_مثالي`,
+      '#تسويق_رقمي',
+      '#عروض_محدودة',
+      '#خصومات_خاصة',
+      '#جودة_فائقة',
+      '#سعر_منافس',
+      '#توصيل_مجاني',
+      '#ضمان_السعادة',
+      '',
+      '### 🎯 **هاشتاجات مستهدفة:**',
+      `#تسوق_الآن_${formData.audience}`,
+      `#${formData.product}_الأفضل`,
+      '#عروض_الساعة',
+      '#خصم_يومي',
+      '#منتجات_متميزة',
+      '#تسويق_ذكي',
+      '#عروض_ساخنة',
+      '#جودة_مضمونة',
+      '#سعر_مذهل',
+      '#خدمة_ممتازة',
+      '',
+      '#تخفيضات #عروض #جودة_عالية #تسويق'
+    ].join('\n')
 
-### 🔥 **الوصف الرئيسي:**
-**${formData.product} - الحل الأمثل لـ ${formData.audience}**
-
-قدم لنفسك تجربة استثنائية مع ${formData.product}، المنتج الثوري الذي صمم خصيصاً لتلبية جميع احتياجات ${formData.audience}. نجمع بين الجودة الفائقة والسعر التنافسي لنقدم لك منتجاً يستحق الاستثمار.
-
-${formData.keyPoints ? `### ✨ **المميزات الرئيسية:**
-${formData.keyPoints.split('\n').map(point => `• ${point.trim()}`).join('\n')}` : ''}
-
-### 💎 **لماذا تختار ${formData.product}؟**
-• **جودة مضمونة:** مواد خام عالية الجودة وأحدث تقنيات التصنيع
-• **سعر تنافسي:** يبدأ من 500 ج.م فقط - أفضل سعر في السوق
-• **خدمة ممتازة:** دعم فني على مدار الساعة وضمان لمدة سنة
-• **توصيل سريع:** استلام خلال 24-48 ساعة في جميع المحافظات
-
-### 🎯 **الجمهور المستهدف:**
-مثالي لـ ${formData.audience} الباحثين عن الحلول المبتكرة والموثوقة.
-
-### 📦 **ما في الصندوق:**
-• ${formData.product} (القطعة الرئيسية)
-• دليل استخدام متعدد اللغات
-• شهادة ضمان الجودة
-• هدية مجانية خاصة
-
-### 💰 **العرض الخاص:**
-احصل على خصم 20% عند الشراء الآن + شحن مجاني للطلبات فوق 1000 ج.م!
-
-${formData.cta ? `### 🚀 **دعوة للعمل:**
-${formData.cta}` : '### 🚀 **دعوة للعمل:**\nاطلب الآن واستمتع بتجربة لا تُنسى!'}
-
----
-#منتج #أوصاف #تسويق #مبيعات`
+    return hashtags
   }
 
-  const generateCopy = async () => {
+  const generateContent = async () => {
     setIsGenerating(true)
-    
     try {
-      const response = await fetch('/api/ai/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          tool: 'copywriting-tools',
-          formData,
-          language: 'ar',
-          context: `Active tab: ${activeTab}, Tool: ${copywritingTools.find(t => t.id === activeTab)?.title}`
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to generate content')
-      }
-
-      const result = await response.json()
+      let content = ''
       
-      setGeneratedCopy(result.content)
-      setMetrics(result.metrics || [])
-      setRecommendations(result.recommendations || [])
-      setScore(result.score || 85)
-      
-    } catch (error) {
-      console.error('AI generation error:', error)
-      // Fallback to original generation
-      let copy = ''
-      
-      switch (activeTab) {
-        case 'ad-copy':
-          copy = generateAdCopy()
-          break
+      switch (activeTool) {
         case 'headlines':
-          copy = generateHeadlines()
+          content = generateHeadlines()
           break
         case 'social-posts':
-          copy = generateSocialPosts()
-          break
-        case 'hashtags':
-          copy = generateHashtags()
+          content = generateSocialPosts()
           break
         case 'email-subjects':
-          copy = generateEmailSubjects()
+          content = generateEmailSubjects()
           break
-        case 'product-descriptions':
-          copy = generateProductDescriptions()
+        case 'hashtags':
+          content = generateHashtags()
           break
         default:
-          copy = generateAdCopy()
+          content = generateHeadlines()
       }
+
+      setGeneratedCopy(content)
+      setResults({
+        summary: `تم إنشاء محتوى لـ ${formData.product}`,
+        tool: activeTool,
+        wordCount: content.split(' ').length,
+        generatedAt: new Date().toISOString()
+      })
       
-      setGeneratedCopy(copy)
-    } finally {
+      setTimeout(() => setIsGenerating(false), 1500)
+    } catch (error) {
+      console.error('Error generating content:', error)
       setIsGenerating(false)
     }
   }
 
-  const resetForm = () => {
-    setFormData({
-      product: '',
-      audience: '',
-      tone: 'professional',
-      length: 'medium',
-      keyPoints: '',
-      cta: ''
-    })
-    setGeneratedCopy('')
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(generatedCopy)
   }
 
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(generatedCopy)
-      alert('تم النسخ إلى الحافظة!')
-    } catch (err) {
-      console.error('فشل النسخ: ', err)
-      alert('فشل النسخ، يرجى المحاولة مرة أخرى.')
-    }
-  }
-
-  const downloadAsText = () => {
-    const blob = new Blob([generatedCopy], { type: 'text/plain;charset=utf-8' })
+  const downloadContent = () => {
+    const blob = new Blob([generatedCopy], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${activeTab}-نصوص-تسويقية.txt`
+    a.download = `${activeTool}-${formData.product}.txt`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
-
   return (
-    <RTLWrapper className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white overflow-hidden relative">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse delay-2000"></div>
+      </div>
+
       <Navigation currentPath="/copywriting-tools-ar" />
-      
-      <div className="pt-20 pb-12">
+
+      <div className="relative z-10 pt-20 pb-12">
         <div className="container mx-auto px-4 max-w-7xl">
           {/* Header */}
           <motion.div
@@ -456,220 +284,272 @@ ${formData.cta}` : '### 🚀 **دعوة للعمل:**\nاطلب الآن واس�
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <div className="inline-flex items-center gap-2 bg-purple-500/20 text-purple-300 px-4 py-2 rounded-full mb-6">
-              <PenTool className="w-4 h-4" />
-              <span className="text-sm font-medium">أدوات كتابة احترافية</span>
+            <div className="inline-flex items-center gap-2 bg-purple-500/20 text-purple-300 px-6 py-3 rounded-full mb-6 backdrop-blur-sm border border-purple-500/30">
+              <Edit className="w-5 h-5" />
+              <span className="text-sm font-medium">أدوات كتابة الإعلانات</span>
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent leading-tight">
-              أدوات كتابة النصوص التسويقية
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+              أدوات كتابة الإعلانات الاحترافية
             </h1>
-            <p className="text-lg md:text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed px-4">
-              قم بإنشاء نصوص تسويقية احترافية وجذابة لجميع قنواتك التسويقية باستخدام الذكاء الاصطناعي المتقدم
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              أنشئ محتوى تسويقي مقنع وعناوين جذابة ومنشورات تواصل اجتماعي وهاشتاجات فعالة لمنتجاتك.
             </p>
           </motion.div>
 
-          {/* Tools Navigation */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mb-12"
-          >
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {copywritingTools.map((tool, index) => (
-                <motion.button
-                  key={tool.id}
-                  onClick={() => setActiveTab(tool.id)}
-                  className={`p-4 md:p-6 rounded-xl border-2 transition-all duration-300 text-center group h-full flex flex-col ${
-                    activeTab === tool.id
-                      ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500/50 text-white shadow-lg shadow-purple-500/25'
-                      : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/10'
-                  }`}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <div className={`inline-flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl mb-3 md:mb-4 bg-gradient-to-br ${tool.color} group-hover:scale-110 transition-transform duration-300`}>
-                    <tool.icon className={`w-6 h-6 md:w-7 md:h-7 ${
-                      activeTab === tool.id ? 'text-white' : 'text-gray-300'
-                    }`} />
-                  </div>
-                  <h3 className="text-base md:text-lg font-bold mb-2 md:mb-3">{tool.title}</h3>
-                  <p className="text-xs md:text-sm opacity-80 leading-relaxed flex-1">{tool.description}</p>
-                  {activeTab === tool.id && (
-                    <Badge className="mt-3 md:mt-4 bg-purple-500/20 text-purple-300 border-purple-500/50 text-xs">
-                      نشط
-                    </Badge>
-                  )}
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Main Content */}
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-start">
-            {/* Form */}
+          <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {/* Input Form */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="lg:col-span-2"
             >
-              <Card className="bg-white/5 backdrop-blur-md border-white/10 shadow-2xl">
-                <CardHeader className="pb-6">
-                  <CardTitle className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3 md:gap-4">
-                    <div className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
-                      <FileText className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                    </div>
-                    إنشاء نص تسويقي
-                  </CardTitle>
-                  <p className="text-gray-400 text-base md:text-lg">املأ البيانات لإنشاء نص احترافي</p>
-                </CardHeader>
-                
-                <CardContent className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                      <Target className="w-4 h-4 text-purple-400" />
-                      المنتج/الخدمة *
-                    </label>
-                    <input
+              <div className="bg-white/5 backdrop-blur-md rounded-3xl p-8 border border-white/10 shadow-2xl">
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-white mb-2">معلومات المنتج</h2>
+                  <p className="text-gray-300">أدخل تفاصيل المنتج لإنشاء محتوى تسويقي مقنع</p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <FlexibleInput
+                      label="اسم المنتج"
                       type="text"
-                      className="w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400 text-base"
                       value={formData.product}
-                      onChange={(e) => handleInputChange('product', e.target.value)}
-                      placeholder="مثال: هاتف ذكي، دورة تدريبية، خدمة استشارات"
-                      required
+                      onChange={(value) => handleInputChange('product', value)}
+                      options={['هاتف ذكي', 'لابتوب', 'ساعة ذكية', 'سماعات', 'كاميرا']}
+                      placeholder="هاتف ذكي"
+                      language="ar"
                     />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                      <Users className="w-4 h-4 text-purple-400" />
-                      الجمهور المستهدف *
-                    </label>
-                    <input
+                    
+                    <FlexibleInput
+                      label="الجمهور المستهدف"
                       type="text"
-                      className="w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400 text-base"
                       value={formData.audience}
-                      onChange={(e) => handleInputChange('audience', e.target.value)}
-                      placeholder="مثال: الشباب، رائدات الأعمال، الطلاب"
-                      required
+                      onChange={(value) => handleInputChange('audience', value)}
+                      options={['الشباب', 'المحترفون', 'الطلاب', 'الرياضيون', 'المسافرون']}
+                      placeholder="الشباب"
+                      language="ar"
                     />
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        نبرة الصوت
+                        نبرة الكتابة
                       </label>
                       <select
-                        className="w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white text-base"
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white appearance-none cursor-pointer"
                         value={formData.tone}
                         onChange={(e) => handleInputChange('tone', e.target.value)}
                       >
-                        {toneOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
+                        {toneOptions.map(option => (
+                          <option key={option.value} value={option.value} className="bg-gray-900 text-white">
                             {option.label}
                           </option>
                         ))}
                       </select>
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        الطول
-                      </label>
-                      <select
-                        className="w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white text-base"
-                        value={formData.length}
-                        onChange={(e) => handleInputChange('length', e.target.value)}
+                    
+                    <div className="flex items-end">
+                      <Button
+                        onClick={() => setActiveTool('headlines')}
+                        className={`flex-1 ${activeTool === 'headlines' ? 'bg-purple-500' : 'bg-white/10'} hover:bg-purple-600 text-white font-medium py-3 px-6 rounded-xl transition-all duration-300`}
                       >
-                        {lengthOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
+                        <Edit className="w-4 h-4 ml-2" />
+                        عناوين
+                      </Button>
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                      <Lightbulb className="w-4 h-4 text-purple-400" />
-                      النقاط الرئيسية
-                    </label>
-                    <textarea
-                      className="w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400 h-28 resize-none text-base"
-                      value={formData.keyPoints}
-                      onChange={(e) => handleInputChange('keyPoints', e.target.value)}
-                      placeholder="أدخل النقاط الرئيسية (كل نقطة في سطر جديد)"
-                    />
-                  </div>
+                  <FlexibleInput
+                    label="نقاط رئيسية (اختياري)"
+                    type="textarea"
+                    value={formData.keyPoints}
+                    onChange={(value) => handleInputChange('keyPoints', value)}
+                    placeholder="جودة عالية&#10;سعر تنافسي&#10;ضمان سنة"
+                    language="ar"
+                  />
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-purple-400" />
-                      دعوة للعمل (CTA)
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400 text-base"
-                      value={formData.cta}
-                      onChange={(e) => handleInputChange('cta', e.target.value)}
-                      placeholder="مثال: اطلب الآن، احصل على خصم، تواصل معنا"
-                    />
-                  </div>
+                  <FlexibleInput
+                    label="دعوة للعمل (CTA) (اختياري)"
+                    type="text"
+                    value={formData.cta}
+                    onChange={(value) => handleInputChange('cta', value)}
+                    options={['اطلب الآن', 'اشترِ الآن', 'احجز مكانك', 'تواصل معنا', 'زُر موقعنا']}
+                    placeholder="اطلب الآن"
+                    language="ar"
+                  />
 
-                  <div className="flex gap-3 pt-4">
-                    <Button
-                      onClick={generateCopy}
-                      disabled={isGenerating || !formData.product || !formData.audience}
-                      className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 text-base"
-                    >
-                      {isGenerating ? (
-                        <>
-                          <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-                          جاري الإنشاء...
-                        </>
-                      ) : (
-                        <>
-                          <Star className="w-4 h-4 ml-2" />
-                          إنشاء بالذكاء الاصطناعي
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={resetForm}
-                      className="border-2 border-white/20 hover:bg-white/10 text-white font-bold py-3 text-base"
-                    >
-                      <RefreshCw className="w-4 h-4 ml-2" />
-                      إعادة تعيين
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                  <Button
+                    onClick={generateContent}
+                    disabled={isGenerating || !formData.product || !formData.audience}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
+                  >
+                    {isGenerating ? (
+                      <div className="flex items-center gap-3">
+                        <RefreshCw className="w-5 h-5 animate-spin" />
+                        جاري إنشاء المحتوى...
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-3">
+                        <Edit className="w-5 h-5" />
+                        إنشاء المحتوى
+                      </div>
+                    )}
+                  </Button>
+                </div>
+              </div>
             </motion.div>
 
-            {/* Output */}
+            {/* Tools Selection */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="space-y-6"
             >
-              <ToolOutput
-                title={copywritingTools.find(t => t.id === activeTab)?.title || 'النص التسويقي'}
-                content={generatedCopy}
-                metrics={metrics}
-                recommendations={recommendations}
-                score={score}
-                isLoading={isGenerating}
-                onCopy={copyToClipboard}
-                onDownload={downloadAsText}
-              />
+              <div className="bg-white/5 backdrop-blur-md rounded-3xl p-6 border border-white/10 shadow-2xl">
+                <h3 className="text-xl font-bold text-white mb-4">أدوات الكتابة</h3>
+                <div className="space-y-4">
+                  {tools.map((tool, index) => (
+                    <motion.div
+                      key={tool.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      className={`bg-white/5 rounded-xl p-4 border border-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer ${activeTool === tool.id ? 'border-purple-500/50 bg-purple-500/10' : ''}`}
+                      onClick={() => setActiveTool(tool.id)}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tool.color} flex items-center justify-center flex-shrink-0`}>
+                          <tool.icon className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-white mb-1">{tool.title}</h4>
+                          <p className="text-sm text-gray-300">
+                            {tool.id === 'headlines' && 'أنشئ عناوين جذابة للإعلانات والمقالات'}
+                            {tool.id === 'social-posts' && 'اكتب منشورات تواصل اجتماعي فعالة'}
+                            {tool.id === 'email-subjects' && 'صمم عناوين بريد إلكتروني مشجعة للفتح'}
+                            {tool.id === 'hashtags' && 'ولد هاشتاجات مستهدفة لزيادة الوصول'}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick Info */}
+              <div className="bg-white/5 backdrop-blur-md rounded-3xl p-6 border border-white/10 shadow-2xl">
+                <h3 className="text-xl font-bold text-white mb-4">نصائح سريعة</h3>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Lightbulb className="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-medium text-white mb-1">كن محددًا</h4>
+                      <p className="text-sm text-gray-300">كلما كانت تفاصيل المنتج أكثر تحديدًا، كان المحتوى أفضل</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Target className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-medium text-white mb-1">اعرف جمهورك</h4>
+                      <p className="text-sm text-gray-300">اختر النبرة المناسبة للجمهور المستهدف</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Zap className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-medium text-white mb-1">اختبر الأدوات</h4>
+                      <p className="text-sm text-gray-300">جرب كل أداة لترى أيها يناسب احتياجاتك أفضل</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </div>
+
+          {/* Results Section */}
+          {generatedCopy && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="mt-16"
+            >
+              <EnhancedResultsDisplay
+                title="المحتوى المُنشأ"
+                subtitle={`محتوى تسويقي لـ ${formData.product} مخصص لـ ${formData.audience}`}
+                results={results}
+                metrics={[]}
+                recommendations={[]}
+                onCopy={copyToClipboard}
+                onDownload={downloadContent}
+                generatedContent={generatedCopy}
+              />
+            </motion.div>
+          )}
+
+          {/* Features Section */}
+          <motion.section
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+            className="mt-24"
+          >
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-white mb-4">مميزات الكتابة الاحترافية</h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                أدوات متقدمة لمساعدتك في إنشاء محتوى تسويقي مقنع وفعال
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[
+                {
+                  icon: Edit,
+                  title: 'عناوين جذابة',
+                  description: 'أنشئ عناوين تجذب الانتباه وتزيد من نسبة النقر.',
+                  color: 'from-purple-500 to-pink-500'
+                },
+                {
+                  icon: MessageSquare,
+                  title: 'منشورات تواصل اجتماعي',
+                  description: 'صمم منشورات لجميع منصات التواصل الاجتماعي.',
+                  color: 'from-blue-500 to-cyan-500'
+                },
+                {
+                  icon: Mail,
+                  title: 'عناوين بريد إلكتروني',
+                  description: 'اكتب عناوين بريد إلكتروني تشجع على الفتح.',
+                  color: 'from-green-500 to-emerald-500'
+                },
+                {
+                  icon: Hash,
+                  title: 'هاشتاجات مستهدفة',
+                  description: 'ولد هاشتاجات تزيد من وصول منشوراتك.',
+                  color: 'from-orange-500 to-red-500'
+                }
+              ].map((feature, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
+                  className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 hover:border-white/30 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/10"
+                >
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6`}>
+                    <feature.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-4">{feature.title}</h3>
+                  <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
         </div>
       </div>
-    </RTLWrapper>
+    </div>
   )
 }

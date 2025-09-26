@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '@/components/Navigation'
-import ToolOutput from '@/components/ToolOutput'
+import FlexibleInput from '@/components/ui/FlexibleInput'
+import EnhancedResultsDisplay from '@/components/ui/EnhancedResultsDisplay'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -47,6 +48,11 @@ export default function CreativeOptimizationTool() {
   const [metrics, setMetrics] = useState<any[]>([])
   const [recommendations, setRecommendations] = useState<string[]>([])
   const [score, setScore] = useState<number | undefined>(undefined)
+  const [results, setResults] = useState<any>(null)
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
 
   const optimizationTools = [
     {
@@ -530,6 +536,16 @@ ${overallScore >= 70 ?
       setRecommendations(result.recommendations || [])
       setScore(result.score || 85)
       
+      // Create results object for EnhancedResultsDisplay
+      const newResults = {
+        content: result.content,
+        title: optimizationTools.find(t => t.id === activeTab)?.title || 'Creative Optimization',
+        metrics: result.metrics || [],
+        recommendations: result.recommendations || [],
+        score: result.score || 85
+      }
+      setResults(newResults)
+      
     } catch (error) {
       console.error('AI generation error:', error)
       // Fallback to original generation
@@ -550,6 +566,16 @@ ${overallScore >= 70 ?
       }
       
       setGeneratedAnalysis(analysis)
+      
+      // Create results object for fallback
+      const fallbackResults = {
+        content: analysis,
+        title: optimizationTools.find(t => t.id === activeTab)?.title || 'Creative Optimization',
+        metrics: [],
+        recommendations: [],
+        score: 75
+      }
+      setResults(fallbackResults)
     } finally {
       setIsGenerating(false)
     }
@@ -568,6 +594,7 @@ ${overallScore >= 70 ?
       creativeElements: ''
     })
     setGeneratedAnalysis('')
+    setResults(null)
   }
 
   const copyToClipboard = async () => {
@@ -872,23 +899,38 @@ ${overallScore >= 70 ?
               </motion.div>
 
               {/* Output */}
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-              >
-                <ToolOutput
-                  title={optimizationTools.find(t => t.id === activeTab)?.title || 'Creative Optimization'}
-                  content={generatedAnalysis}
-                  metrics={metrics}
-                  recommendations={recommendations}
-                  score={score}
-                  isLoading={isGenerating}
-                  onCopy={copyToClipboard}
-                  onDownload={downloadAsText}
-                  language="en"
-                />
-              </motion.div>
+              {/* Results - Only show when results exist */}
+              {results && (
+                <motion.div
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <EnhancedResultsDisplay
+                    results={results}
+                    onReset={() => {
+                      setResults(null)
+                      setFormData({
+                        adType: 'video',
+                        hookType: 'shock',
+                        retentionRate: '',
+                        ctr: '',
+                        audience: '',
+                        product: '',
+                        tone: 'professional',
+                        cta: '',
+                        creativeElements: ''
+                      })
+                    }}
+                    exportData={{
+                      content: results.content,
+                      format: 'txt',
+                      filename: `${activeTab}-optimization.txt`
+                    }}
+                    language="en"
+                  />
+                </motion.div>
+              )}
             </div>
           </div>
         </section>

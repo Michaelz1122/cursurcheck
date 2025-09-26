@@ -4,8 +4,11 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '@/components/Navigation'
 import RTLWrapper from '@/components/RTLWrapper'
+import FlexibleInput from '@/components/ui/FlexibleInput'
+import EnhancedResultsDisplay from '@/components/ui/EnhancedResultsDisplay'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { 
   Calculator, 
   TrendingUp, 
@@ -21,7 +24,9 @@ import {
   Activity,
   Zap,
   Award,
-  RefreshCw
+  RefreshCw,
+  Star,
+  Lightbulb
 } from 'lucide-react'
 
 export default function ROICalculatorArabic() {
@@ -55,8 +60,16 @@ export default function ROICalculatorArabic() {
   ]
 
   const channels = [
-    'إعلانات فيسبوك', 'إعلانات جوجل', 'إنستجرام', 'لينكدإن', 'تيك توك',
+    'إعلانات فيسبوك', 'إعلانات جوجل', 'إنستغرام', 'لينكدإن', 'تيك توك',
     'التسويق عبر البريد', 'السيو', 'تسويق المحتوى', 'تسويق المؤثرين', 'أخرى'
+  ]
+
+  const platforms = [
+    'فيسبوك', 'جوجل', 'إنستغرام', 'تيك توك', 'لينكدإن', 'بنترست', 'سناب شات', 'يوتيوب'
+  ]
+
+  const durations = [
+    '7', '15', '30', '60', '90'
   ]
 
   const handleInputChange = (field: string, value: string) => {
@@ -119,19 +132,51 @@ export default function ROICalculatorArabic() {
     }
 
     return {
-      roas: roas.toFixed(2),
-      profit: profit.toFixed(2),
-      profitMargin: profitMargin.toFixed(1),
-      dailyAdSpend: dailyAdSpend.toFixed(2),
-      dailyRevenue: dailyRevenue.toFixed(2),
-      dailyROAS: dailyROAS.toFixed(2),
-      efficiencyScore: efficiencyScore.toFixed(0),
+      content: generateROASContent({
+        roas, profit, profitMargin, dailyAdSpend, dailyRevenue, dailyROAS,
+        campaignName: roasData.campaignName || 'حملة غير مسماة',
+        platform: roasData.platform || 'منصة غير محددة',
+        duration: roasData.duration
+      }),
+      metrics: [
+        {
+          label: 'العائد على إنفاق الإعلانات',
+          value: roas.toFixed(2) + 'x',
+          color: roas >= 3 ? '#22c55e' : roas >= 2 ? '#eab308' : '#ef4444',
+          icon: <TrendingUp className="w-4 h-4" />
+        },
+        {
+          label: 'صافي الربح',
+          value: formatCurrency(profit.toString()),
+          color: profit >= 0 ? '#22c55e' : '#ef4444',
+          icon: <DollarSign className="w-4 h-4" />
+        },
+        {
+          label: 'هامش الربح',
+          value: profitMargin.toFixed(1) + '%',
+          color: profitMargin >= 30 ? '#22c55e' : profitMargin >= 15 ? '#eab308' : '#ef4444',
+          icon: <PieChart className="w-4 h-4" />
+        },
+        {
+          label: 'متوسط الإنفاق اليومي',
+          value: formatCurrency(dailyAdSpend.toString()),
+          icon: <BarChart3 className="w-4 h-4" />
+        },
+        {
+          label: 'متوسط الإيرادات اليومية',
+          value: formatCurrency(dailyRevenue.toString()),
+          icon: <TrendingUp className="w-4 h-4" />
+        },
+        {
+          label: 'درجة الكفاءة',
+          value: efficiencyScore.toFixed(0) + '/100',
+          color: efficiencyScore >= 80 ? '#22c55e' : efficiencyScore >= 60 ? '#eab308' : '#ef4444',
+          icon: <Star className="w-4 h-4" />
+        }
+      ],
       recommendations,
       strengths,
-      metrics: {
-        roasScore,
-        profitScore
-      }
+      score: Math.round(efficiencyScore)
     }
   }
 
@@ -198,22 +243,157 @@ export default function ROICalculatorArabic() {
     }
 
     return {
-      roi: roi.toFixed(1),
-      roas: roas.toFixed(2),
-      cac: cac.toFixed(2),
-      breakEvenOrders: breakEvenOrders.toFixed(0),
-      monthlyRevenue: monthlyRevenue.toFixed(0),
-      monthlyProfit: monthlyProfit.toFixed(0),
-      netProfit: netProfit.toFixed(0),
-      overallScore: overallScore.toFixed(0),
+      content: generateROIContent({
+        roi, roas, cac, breakEvenOrders, monthlyRevenue, monthlyProfit, netProfit,
+        industry: formData.industry || 'صناعة غير محددة',
+        channel: formData.marketingChannel || 'قناة غير محددة'
+      }),
+      metrics: [
+        {
+          label: 'العائد على الاستثمار',
+          value: roi.toFixed(1) + '%',
+          color: roi >= 100 ? '#22c55e' : roi >= 50 ? '#eab308' : '#ef4444',
+          icon: <TrendingUp className="w-4 h-4" />
+        },
+        {
+          label: 'العائد على إنفاق الإعلانات',
+          value: roas.toFixed(2) + 'x',
+          color: roas >= 3 ? '#22c55e' : roas >= 2 ? '#eab308' : '#ef4444',
+          icon: <BarChart3 className="w-4 h-4" />
+        },
+        {
+          label: 'تكلفة اكتساب العميل',
+          value: formatCurrency(cac.toString()),
+          color: cac <= averageOrderValue * 0.5 ? '#22c55e' : cac <= averageOrderValue ? '#eab308' : '#ef4444',
+          icon: <Users className="w-4 h-4" />
+        },
+        {
+          label: 'الإيرادات الشهرية',
+          value: formatCurrency(monthlyRevenue.toString()),
+          color: '#3b82f6',
+          icon: <DollarSign className="w-4 h-4" />
+        },
+        {
+          label: 'صافي الربح الشهري',
+          value: formatCurrency(netProfit.toString()),
+          color: netProfit >= 0 ? '#22c55e' : '#ef4444',
+          icon: <PieChart className="w-4 h-4" />
+        },
+        {
+          label: 'طلبات التعادل',
+          value: Math.ceil(breakEvenOrders).toString(),
+          color: breakEvenOrders <= monthlyOrders ? '#22c55e' : '#ef4444',
+          icon: <Target className="w-4 h-4" />
+        }
+      ],
       recommendations,
       strengths,
-      metrics: {
-        roiScore,
-        roasScore,
-        cacScore
-      }
+      score: Math.round(overallScore)
     }
+  }
+
+  const generateROIContent = (data: any) => {
+    return `
+### 📊 تحليل أداء الاستثمار التسويقي
+
+#### 🎯 نظرة عامة على الحملة
+- **الصناعة**: ${data.industry}
+- **قناة التسويق**: ${data.channel}
+- **العائد على الاستثمار**: ${data.roi.toFixed(1)}%
+- **العائد على إنفاق الإعلانات**: ${data.roas.toFixed(2)}x
+
+#### 💰 التحليل المالي
+**📈 الإيرادات والأرباح**
+- الإيرادات الشهرية: ${formatCurrency(data.monthlyRevenue.toString())}
+- صافي الربح الشهري: ${formatCurrency(data.netProfit.toString())}
+- هامش الربح الصافي: ${data.netProfit > 0 ? ((data.netProfit / data.monthlyRevenue) * 100).toFixed(1) : 0}%
+
+**🎯 تكاليف اكتساب العملاء**
+- تكلفة اكتساب العميل (CAC): ${formatCurrency(data.cac.toString())}
+- عدد الطلبات المطلوبة للتعادل: ${Math.ceil(data.breakEvenOrders)} طلب
+
+#### 🏆 تقييم الأداء
+${data.roi >= 200 ? '✅ **أداء استثنائي**: عائد استثمار ممتاز يفوق معايير الصناعة' : ''}
+${data.roi >= 100 && data.roi < 200 ? '✅ **أداء جيد**: عائد استثمار إيجابي ومستقر' : ''}
+${data.roi > 0 && data.roi < 100 ? '⚠️ **أداء مقبول**: هناك مجال للتحسين في العائد' : ''}
+${data.roi <= 0 ? '❌ **أداء ضعيف**: الحملة غير مربحة وتحتاج إلى مراجعة' : ''}
+
+${data.roas >= 3 ? '✅ **ROAS ممتاز**: عائد قوي على إنفاق الإعلانات' : ''}
+${data.roas >= 2 && data.roas < 3 ? '✅ **ROAS جيد**: أداء إعلاني مقبول' : ''}
+${data.roas >= 1 && data.roas < 2 ? '⚠️ **ROAS يحتاج تحسين**: يمكن تحسين أداء الإعلانات' : ''}
+${data.roas < 1 ? '❌ **ROAS ضعيف**: الإنفاق الإعلاني يتجاوز الإيرادات' : ''}
+
+#### 📋 توصيات التحسين
+- راقب أداء الحملة بانتظام وقم بتعديل الميزانية حسب النتائج
+- اختبر إبداعات إعلانية مختلفة لتحسين معدلات التحويل
+- استهدف شرائح جمهور أكثر دقة لتحسين تكلفة اكتساب العميل
+- فكر في توسيع القنوات الناجحة وتقليل الإنفاق على القنوات الأقل أداءً
+
+#### 🔍 الخطوات التالية
+1. **تحليل الجمهور**: افهم بشكل أفضل من هم عملاؤك الأكثر قيمة
+2. **تحسين الإعلانات**: اختبر عناصر إبداعية ورسائل مختلفة
+3. **تحسين التحويل**: حسّن صفحات الهبوط لتقليل تكلفة اكتساب العميل
+4. **قياس النتائج**: تتبع المقاييس الرئيسية بانتظام واتخذ قرارات مبنية على البيانات
+    `.trim()
+  }
+
+  const generateROASContent = (data: any) => {
+    return `
+### 📊 تحليل أداء الإعلانات (ROAS)
+
+#### 🎯 معلومات الحملة
+- **اسم الحملة**: ${data.campaignName}
+- **المنصة**: ${data.platform}
+- **المدة**: ${data.duration} يوم
+- **العائد على إنفاق الإعلانات**: ${data.roas.toFixed(2)}x
+
+#### 💰 الأداء المالي
+**📈 الإيرادات والتكاليف**
+- إجمالي الإيرادات: ${formatCurrency(data.revenue.toString())}
+- إجمالي الإنفاق: ${formatCurrency(data.adSpend.toString())}
+- صافي الربح: ${formatCurrency(data.profit.toString())}
+- هامش الربح: ${data.profitMargin.toFixed(1)}%
+
+**📊 الأداء اليومي**
+- متوسط الإنفاق اليومي: ${formatCurrency(data.dailyAdSpend.toString())}
+- متوسط الإيرادات اليومية: ${formatCurrency(data.dailyRevenue.toString())}
+- ROAS اليومي: ${data.dailyROAS.toFixed(2)}x
+
+#### 🏆 تقييم الأداء
+${data.roas >= 4 ? '🌟 **أداء استثنائي**: ROAS ممتاز يفوق توقعات الصناعة' : ''}
+${data.roas >= 3 && data.roas < 4 ? '✅ **أداء جيد**: ROAS صحي ومربح' : ''}
+${data.roas >= 2 && data.roas < 3 ? '⚠️ **أداء مقبول**: هناك مجال للتحسين' : ''}
+${data.roas >= 1 && data.roas < 2 ? '⚠️ **أداء ضعيف**: هوامش ربح منخفضة' : ''}
+${data.roas < 1 ? '❌ **أداء سيء**: الحملة تخسر المال' : ''}
+
+${data.profitMargin >= 50 ? '💎 **هوامش ربح استثنائية**: ربحية ممتازة' : ''}
+${data.profitMargin >= 30 && data.profitMargin < 50 ? '✅ **هوامش ربح صحية**: أداء مالي جيد' : ''}
+${data.profitMargin >= 15 && data.profitMargin < 30 ? '⚠️ **هوامش ربح مقبولة**: يمكن تحسينها' : ''}
+${data.profitMargin >= 0 && data.profitMargin < 15 ? '⚠️ **هوامش ربح منخفضة**: راجع التسعير' : ''}
+${data.profitMargin < 0 ? '❌ **خسارة**: الحملة غير مربحة' : ''}
+
+#### 📋 توصيات التحسين
+- قم بتحليل الإعلانات الأعلى أداءً وزيادة ميزانيتها
+- اختبر جماهير مختلفة لتحسين الاستهداف
+- راقب الأداء اليومي وتأكد من الاستقرار
+- فكر في تغيير الإبداعات إذا كان الأداء ضعيفاً
+
+#### 🔍 الخطوات التالية
+1. **تحليل الإعلانات**: حدد الإعلانات الأعلى ROAS
+2. **تحسين الاستهداف**: ضبط الجمهور وال demographics
+3. **اختبار A/B**: جرب عناصر إبداعية مختلفة
+4. **مراقبة الأداء**: تتبع التغيرات اليومية والأسبوعية
+    `.trim()
+  }
+
+  const formatCurrency = (value: string) => {
+    const num = parseFloat(value)
+    return new Intl.NumberFormat('ar-EG', {
+      style: 'currency',
+      currency: 'EGP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(num)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -233,29 +413,6 @@ export default function ROICalculatorArabic() {
       }
       setIsCalculating(false)
     }, 1500)
-  }
-
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-400'
-    if (score >= 60) return 'text-yellow-400'
-    return 'text-red-400'
-  }
-
-  const getScoreLabel = (score: number) => {
-    if (score >= 80) return 'ممتاز'
-    if (score >= 60) return 'جيد'
-    if (score >= 40) return 'مقبول'
-    return 'ضعيف'
-  }
-
-  const formatCurrency = (value: string) => {
-    const num = parseFloat(value)
-    return new Intl.NumberFormat('ar-EG', {
-      style: 'currency',
-      currency: 'EGP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(num)
   }
 
   const resetForm = () => {
@@ -281,7 +438,7 @@ export default function ROICalculatorArabic() {
   }
 
   return (
-    <RTLWrapper className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white overflow-hidden relative">
+    <RTLWrapper language="ar" className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white overflow-hidden relative">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent"></div>
@@ -364,388 +521,264 @@ export default function ROICalculatorArabic() {
               </CardHeader>
 
               <CardContent className="space-y-6">
-                {activeTab === 'roi' ? (
-                  !results ? (
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      {/* Basic Metrics */}
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-purple-400" />
-                            الإنفاق الإعلاني الشهري *
-                          </label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {activeTab === 'roi' ? (
+                    !results ? (
+                      <>
+                        {/* Basic Metrics */}
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <FlexibleInput
+                            label="الإنفاق الإعلاني الشهري"
                             value={formData.monthlyAdSpend}
-                            onChange={(e) => handleInputChange('monthlyAdSpend', e.target.value)}
+                            onChange={(value) => handleInputChange('monthlyAdSpend', value)}
+                            type="currency"
                             placeholder="5000"
-                            min="0"
-                            step="100"
                             required
+                            language="ar"
                           />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <Target className="w-4 h-4 text-purple-400" />
-                            متوسط قيمة الطلب *
-                          </label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                          
+                          <FlexibleInput
+                            label="متوسط قيمة الطلب"
                             value={formData.averageOrderValue}
-                            onChange={(e) => handleInputChange('averageOrderValue', e.target.value)}
+                            onChange={(value) => handleInputChange('averageOrderValue', value)}
+                            type="currency"
                             placeholder="250"
-                            min="0"
-                            step="10"
                             required
+                            language="ar"
                           />
                         </div>
-                      </div>
 
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <Users className="w-4 h-4 text-purple-400" />
-                            الطلبات الشهرية *
-                          </label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <FlexibleInput
+                            label="الطلبات الشهرية"
                             value={formData.monthlyOrders}
-                            onChange={(e) => handleInputChange('monthlyOrders', e.target.value)}
+                            onChange={(value) => handleInputChange('monthlyOrders', value)}
+                            type="number"
                             placeholder="100"
-                            min="0"
-                            step="1"
                             required
+                            language="ar"
                           />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <BarChart3 className="w-4 h-4 text-purple-400" />
-                            معدل التحويل (%)
-                          </label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                          
+                          <FlexibleInput
+                            label="معدل التحويل (%)"
                             value={formData.conversionRate}
-                            onChange={(e) => handleInputChange('conversionRate', e.target.value)}
+                            onChange={(value) => handleInputChange('conversionRate', value)}
+                            type="percentage"
                             placeholder="2.5"
-                            min="0"
-                            max="100"
-                            step="0.1"
+                            language="ar"
                           />
                         </div>
-                      </div>
 
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-purple-400" />
-                            هامش الربح (%)
-                          </label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <FlexibleInput
+                            label="هامش الربح (%)"
                             value={formData.profitMargin}
-                            onChange={(e) => handleInputChange('profitMargin', e.target.value)}
+                            onChange={(value) => handleInputChange('profitMargin', value)}
+                            type="percentage"
                             placeholder="30"
-                            min="0"
-                            max="100"
-                            step="1"
+                            language="ar"
                           />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <Award className="w-4 h-4 text-purple-400" />
-                            قيمة العميل مدى الحياة
-                          </label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                          
+                          <FlexibleInput
+                            label="قيمة العميل مدى الحياة"
                             value={formData.customerLifetimeValue}
-                            onChange={(e) => handleInputChange('customerLifetimeValue', e.target.value)}
+                            onChange={(value) => handleInputChange('customerLifetimeValue', value)}
+                            type="currency"
                             placeholder="1000"
-                            min="0"
-                            step="10"
+                            language="ar"
                           />
                         </div>
-                      </div>
 
-                      <div className="flex gap-4 pt-4">
-                        <Button
-                          type="submit"
-                          disabled={isCalculating || !formData.monthlyAdSpend || !formData.averageOrderValue || !formData.monthlyOrders}
-                          className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                        >
-                          {isCalculating ? (
-                            <>
-                              <RefreshCw className="w-4 h-4 ml-2 animate-spin" />
-                              جاري الحساب...
-                            </>
-                          ) : (
-                            <>
-                              <Calculator className="w-4 h-4 ml-2" />
-                              احسب العائد
-                            </>
-                          )}
-                        </Button>
-                        <Button
-                          type="button"
-                          onClick={resetForm}
-                          variant="outline"
-                          className="border-white/20 text-white hover:bg-white/10 font-medium py-3 px-6 rounded-lg transition-all duration-300"
-                        >
-                          <RefreshCw className="w-4 h-4 ml-2" />
-                          إعادة تعيين
-                        </Button>
-                      </div>
-                    </form>
-                  ) : (
-                    <div className="space-y-6">
-                      <div className="text-center">
-                        <h3 className="text-2xl font-bold text-white mb-4">نتائج العائد على الاستثمار</h3>
-                        <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-300 px-4 py-2 rounded-full">
-                          <CheckCircle className="w-4 h-4" />
-                          <span className="text-sm font-medium">تم الحساب بنجاح</span>
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <FlexibleInput
+                            label="الصناعة"
+                            value={formData.industry}
+                            onChange={(value) => handleInputChange('industry', value)}
+                            type="text"
+                            options={industries}
+                            language="ar"
+                          />
+                          
+                          <FlexibleInput
+                            label="قناة التسويق"
+                            value={formData.marketingChannel}
+                            onChange={(value) => handleInputChange('marketingChannel', value)}
+                            type="text"
+                            options={channels}
+                            language="ar"
+                          />
                         </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-8">
+                        <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-white mb-2">
+                          تم حساب العائد على الاستثمار بنجاح
+                        </h3>
+                        <p className="text-gray-400">
+                          يمكنك عرض النتائج التفصيلية في الجانب الأيمن أو إعادة تعيين النموذج لحساب جديد
+                        </p>
                       </div>
-
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <Card className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500/30">
-                          <CardContent className="p-6 text-center">
-                            <div className="text-3xl font-bold text-white mb-2">{results.roi}%</div>
-                            <div className="text-sm text-gray-300">العائد على الاستثمار</div>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border-blue-500/30">
-                          <CardContent className="p-6 text-center">
-                            <div className="text-3xl font-bold text-white mb-2">{results.roas}x</div>
-                            <div className="text-sm text-gray-300">العائد على إنفاق الإعلانات</div>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-green-500/30">
-                          <CardContent className="p-6 text-center">
-                            <div className="text-3xl font-bold text-white mb-2">{formatCurrency(results.cac)}</div>
-                            <div className="text-sm text-gray-300">تكلفة اكتساب العميل</div>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-gradient-to-br from-orange-500/20 to-red-500/20 border-orange-500/30">
-                          <CardContent className="p-6 text-center">
-                            <div className="text-3xl font-bold text-white mb-2">{results.breakEvenOrders}</div>
-                            <div className="text-sm text-gray-300">طلبات التعادل</div>
-                          </CardContent>
-                        </Card>
-                      </div>
-
-                      <div className="text-center">
-                        <Button
-                          onClick={() => setResults(null)}
-                          variant="outline"
-                          className="border-white/20 text-white hover:bg-white/10"
-                        >
-                          <RefreshCw className="w-4 h-4 ml-2" />
-                          حساب جديد
-                        </Button>
-                      </div>
-                    </div>
-                  )
-                ) : (
-                  !roasResults ? (
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-blue-400" />
-                            الإنفاق الإعلاني *
-                          </label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                    )
+                  ) : (
+                    !roasResults ? (
+                      <>
+                        {/* ROAS Form */}
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <FlexibleInput
+                            label="الإنفاق الإعلاني"
                             value={roasData.adSpend}
-                            onChange={(e) => handleRoasChange('adSpend', e.target.value)}
+                            onChange={(value) => handleRoasChange('adSpend', value)}
+                            type="currency"
                             placeholder="5000"
-                            min="0"
-                            step="100"
                             required
+                            language="ar"
                           />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-blue-400" />
-                            الإيرادات *
-                          </label>
-                          <input
-                            type="number"
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                          
+                          <FlexibleInput
+                            label="الإيرادات"
                             value={roasData.revenue}
-                            onChange={(e) => handleRoasChange('revenue', e.target.value)}
+                            onChange={(value) => handleRoasChange('revenue', value)}
+                            type="currency"
                             placeholder="15000"
-                            min="0"
-                            step="100"
                             required
+                            language="ar"
                           />
                         </div>
-                      </div>
 
-                      <div className="flex gap-4 pt-4">
-                        <Button
-                          type="submit"
-                          disabled={isCalculating || !roasData.adSpend || !roasData.revenue}
-                          className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                        >
-                          {isCalculating ? (
-                            <>
-                              <RefreshCw className="w-4 h-4 ml-2 animate-spin" />
-                              جاري الحساب...
-                            </>
-                          ) : (
-                            <>
-                              <Calculator className="w-4 h-4 ml-2" />
-                              احسب ROAS
-                            </>
-                          )}
-                        </Button>
-                        <Button
-                          type="button"
-                          onClick={resetForm}
-                          variant="outline"
-                          className="border-white/20 text-white hover:bg-white/10 font-medium py-3 px-6 rounded-lg transition-all duration-300"
-                        >
-                          <RefreshCw className="w-4 h-4 ml-2" />
-                          إعادة تعيين
-                        </Button>
-                      </div>
-                    </form>
-                  ) : (
-                    <div className="space-y-6">
-                      <div className="text-center">
-                        <h3 className="text-2xl font-bold text-white mb-4">نتائج العائد على إنفاق الإعلانات</h3>
-                        <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-300 px-4 py-2 rounded-full">
-                          <CheckCircle className="w-4 h-4" />
-                          <span className="text-sm font-medium">تم الحساب بنجاح</span>
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <FlexibleInput
+                            label="اسم الحملة"
+                            value={roasData.campaignName}
+                            onChange={(value) => handleRoasChange('campaignName', value)}
+                            type="text"
+                            placeholder="حملة رمضان 2024"
+                            language="ar"
+                          />
+                          
+                          <FlexibleInput
+                            label="المنصة"
+                            value={roasData.platform}
+                            onChange={(value) => handleRoasChange('platform', value)}
+                            type="text"
+                            options={platforms}
+                            language="ar"
+                          />
                         </div>
-                      </div>
 
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <Card className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border-blue-500/30">
-                          <CardContent className="p-6 text-center">
-                            <div className="text-3xl font-bold text-white mb-2">{roasResults.roas}x</div>
-                            <div className="text-sm text-gray-300">العائد على إنفاق الإعلانات</div>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-green-500/30">
-                          <CardContent className="p-6 text-center">
-                            <div className="text-3xl font-bold text-white mb-2">{formatCurrency(roasResults.profit)}</div>
-                            <div className="text-sm text-gray-300">الربح الصافي</div>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500/30">
-                          <CardContent className="p-6 text-center">
-                            <div className="text-3xl font-bold text-white mb-2">{roasResults.profitMargin}%</div>
-                            <div className="text-sm text-gray-300">هامش الربح</div>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-gradient-to-br from-orange-500/20 to-red-500/20 border-orange-500/30">
-                          <CardContent className="p-6 text-center">
-                            <div className="text-3xl font-bold text-white mb-2">{roasResults.efficiencyScore}/100</div>
-                            <div className="text-sm text-gray-300">نقاط الكفاءة</div>
-                          </CardContent>
-                        </Card>
+                        <FlexibleInput
+                          label="مدة الحملة (أيام)"
+                          value={roasData.duration}
+                          onChange={(value) => handleRoasChange('duration', value)}
+                          type="number"
+                          options={durations}
+                          language="ar"
+                        />
+                      </>
+                    ) : (
+                      <div className="text-center py-8">
+                        <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-white mb-2">
+                          تم حساب العائد على إنفاق الإعلانات بنجاح
+                        </h3>
+                        <p className="text-gray-400">
+                          يمكنك عرض النتائج التفصيلية في الجانب الأيمن أو إعادة تعيين النموذج لحساب جديد
+                        </p>
                       </div>
+                    )
+                  )}
 
-                      <div className="text-center">
-                        <Button
-                          onClick={() => setRoasResults(null)}
-                          variant="outline"
-                          className="border-white/20 text-white hover:bg-white/10"
-                        >
-                          <RefreshCw className="w-4 h-4 ml-2" />
-                          حساب جديد
-                        </Button>
-                      </div>
-                    </div>
-                  )
-                )}
+                  <div className="flex gap-4 pt-4">
+                    <Button
+                      type="submit"
+                      disabled={isCalculating || (activeTab === 'roi' ? (!formData.monthlyAdSpend || !formData.averageOrderValue || !formData.monthlyOrders) : (!roasData.adSpend || !roasData.revenue))}
+                      className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    >
+                      {isCalculating ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 ml-2 animate-spin" />
+                          جاري الحساب...
+                        </>
+                      ) : (
+                        <>
+                          <Calculator className="w-4 h-4 ml-2" />
+                          احسب العائد
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={resetForm}
+                      variant="outline"
+                      className="border-white/20 text-white hover:bg-white/10 font-medium py-3 px-6 rounded-lg transition-all duration-300"
+                    >
+                      <RefreshCw className="w-4 h-4 ml-2" />
+                      إعادة تعيين
+                    </Button>
+                  </div>
+                </form>
               </CardContent>
             </Card>
           </motion.div>
 
-          {/* Results Panel */}
+          {/* Results */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="space-y-6"
+            className="lg:col-span-1"
           >
-            {(results || roasResults) && (
+            {results && (
+              <EnhancedResultsDisplay
+                title="تحليل العائد على الاستثمار"
+                results={results}
+                language="ar"
+                toolType="roi-calculator"
+              />
+            )}
+            
+            {roasResults && (
+              <EnhancedResultsDisplay
+                title="تحليل العائد على إنفاق الإعلانات"
+                results={roasResults}
+                language="ar"
+                toolType="roas-calculator"
+              />
+            )}
+
+            {!results && !roasResults && (
               <Card className="bg-white/5 backdrop-blur-md border-white/10 shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-purple-400" />
-                    التحليل والتوصيات
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {(results?.strengths.length > 0 || roasResults?.strengths.length > 0) && (
-                    <div>
-                      <h4 className="text-sm font-medium text-green-400 mb-2">نقاط القوة:</h4>
-                      <ul className="space-y-1">
-                        {(results?.strengths || roasResults?.strengths || []).map((strength: string, index: number) => (
-                          <li key={index} className="text-sm text-gray-300 flex items-center gap-2">
-                            <CheckCircle className="w-3 h-3 text-green-400" />
-                            {strength}
-                          </li>
-                        ))}
-                      </ul>
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Calculator className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    جاهز للحساب
+                  </h3>
+                  <p className="text-gray-400 mb-6">
+                    أدخل بيانات حملتك في النموذج واحصل على تحليل مفصل للأداء والتوصيات الذكية
+                  </p>
+                  <div className="space-y-3 text-left">
+                    <div className="flex items-center gap-3 text-sm text-gray-300">
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <span>تحليل شامل للأداء</span>
                     </div>
-                  )}
-                  
-                  {(results?.recommendations.length > 0 || roasResults?.recommendations.length > 0) && (
-                    <div>
-                      <h4 className="text-sm font-medium text-yellow-400 mb-2">التوصيات:</h4>
-                      <ul className="space-y-1">
-                        {(results?.recommendations || roasResults?.recommendations || []).map((recommendation: string, index: number) => (
-                          <li key={index} className="text-sm text-gray-300 flex items-center gap-2">
-                            <AlertCircle className="w-3 h-3 text-yellow-400" />
-                            {recommendation}
-                          </li>
-                        ))}
-                      </ul>
+                    <div className="flex items-center gap-3 text-sm text-gray-300">
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <span>توصيات ذكية مخصصة</span>
                     </div>
-                  )}
+                    <div className="flex items-center gap-3 text-sm text-gray-300">
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <span>تصدير النتائج بصيغ متعددة</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-gray-300">
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <span>مقاييس تفصيلية ورسوم بيانية</span>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             )}
-
-            <Card className="bg-white/5 backdrop-blur-md border-white/10 shadow-2xl">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
-                  <PieChart className="w-5 h-5 text-purple-400" />
-                  نصائح احترافية
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="text-sm text-gray-300">
-                  <div className="flex items-start gap-2 mb-2">
-                    <Zap className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
-                    <span>ركز على تحسين معدل التحويل قبل زيادة الإنفاق الإعلاني</span>
-                  </div>
-                  <div className="flex items-start gap-2 mb-2">
-                    <Target className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                    <span>استهدف الجمهور المناسب لزيادة فعالية حملاتك</span>
-                  </div>
-                  <div className="flex items-start gap-2 mb-2">
-                    <TrendingUp className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-                    <span>تابع المقاييس بانتظام لاتخاذ قرارات مستنيرة</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Award className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
-                    <span>اختبر إعلانات مختلفة لتحسين الأداء باستمرار</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </motion.div>
         </div>
       </div>

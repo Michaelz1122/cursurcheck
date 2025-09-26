@@ -207,7 +207,7 @@ export default function ToolsPage() {
     }
   ]
 
-  const allTools = [...toolsByCategory.mediaBuyers, ...toolsByCategory.marketers, ...toolsByCategory.contentWriters];
+  const allTools = [...toolsByCategory.mediaBuyers, ...toolsByCategory.marketers, ...toolsByCategory.contentWriters]}
 
   const filteredTools = activeCategory === 'all' 
     ? allTools 

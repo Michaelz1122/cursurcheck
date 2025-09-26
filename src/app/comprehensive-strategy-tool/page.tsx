@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '@/components/Navigation'
-import ToolOutput from '@/components/ToolOutput'
+import FlexibleInput from '@/components/ui/FlexibleInput'
+import EnhancedResultsDisplay from '@/components/ui/EnhancedResultsDisplay'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -54,6 +55,11 @@ export default function ComprehensiveStrategyTool() {
   const [metrics, setMetrics] = useState<any[]>([])
   const [recommendations, setRecommendations] = useState<string[]>([])
   const [score, setScore] = useState<number | undefined>(undefined)
+  const [results, setResults] = useState<any>(null)
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
 
   const marketingStrategySections = [
     {
@@ -1238,6 +1244,17 @@ export default function ComprehensiveStrategyTool() {
       }
 
       setGeneratedStrategy(strategy)
+      
+      // Create results object for EnhancedResultsDisplay
+      const newResults = {
+        content: strategy,
+        title: marketingStrategySections.find(s => s.id === activeTab)?.title || 'Comprehensive Strategy',
+        metrics: [],
+        recommendations: [],
+        score: 85
+      }
+      setResults(newResults)
+      
       setIsGenerating(false)
     }, 2000)
   }
@@ -1274,122 +1291,78 @@ export default function ComprehensiveStrategyTool() {
                   Business Information
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Business Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.businessName}
-                    onChange={(e) => setFormData({...formData, businessName: e.target.value})}
-                    className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
-                    placeholder="Enter your business name"
-                  />
-                </div>
+              <CardContent className="space-y-6">
+                <FlexibleInput
+                  label="Business Name"
+                  type="text"
+                  value={formData.businessName}
+                  onChange={(value) => handleInputChange('businessName', value)}
+                  options={['Acme Corp', 'Tech Solutions', 'Global Industries', 'Innovation Labs', 'Future Systems']}
+                  placeholder="Enter your business name"
+                  language="en"
+                  required={true}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Industry
-                  </label>
-                  <select
-                    value={formData.industry}
-                    onChange={(e) => setFormData({...formData, industry: e.target.value})}
-                    className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white focus:outline-none focus:border-purple-500/50"
-                  >
-                    <option value="">Select Industry</option>
-                    {industryOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <FlexibleInput
+                  label="Industry"
+                  type="select"
+                  value={formData.industry}
+                  onChange={(value) => handleInputChange('industry', value)}
+                  options={industryOptions.map(opt => opt.value)}
+                  placeholder="Select Industry"
+                  language="en"
+                  required={true}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Budget
-                  </label>
-                  <select
-                    value={formData.budget}
-                    onChange={(e) => setFormData({...formData, budget: e.target.value})}
-                    className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white focus:outline-none focus:border-purple-500/50"
-                  >
-                    <option value="">Select Budget Range</option>
-                    {budgetOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <FlexibleInput
+                  label="Budget"
+                  type="select"
+                  value={formData.budget}
+                  onChange={(value) => handleInputChange('budget', value)}
+                  options={budgetOptions.map(opt => opt.value)}
+                  placeholder="Select Budget Range"
+                  language="en"
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Duration
-                  </label>
-                  <select
-                    value={formData.duration}
-                    onChange={(e) => setFormData({...formData, duration: e.target.value})}
-                    className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white focus:outline-none focus:border-purple-500/50"
-                  >
-                    <option value="">Select Duration</option>
-                    {durationOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <FlexibleInput
+                  label="Duration"
+                  type="select"
+                  value={formData.duration}
+                  onChange={(value) => handleInputChange('duration', value)}
+                  options={durationOptions.map(opt => opt.value)}
+                  placeholder="Select Duration"
+                  language="en"
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Target Audience
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.targetAudience}
-                    onChange={(e) => setFormData({...formData, targetAudience: e.target.value})}
-                    className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
-                    placeholder="Describe your target audience"
-                  />
-                </div>
+                <FlexibleInput
+                  label="Target Audience"
+                  type="text"
+                  value={formData.targetAudience}
+                  onChange={(value) => handleInputChange('targetAudience', value)}
+                  options={['Young professionals', 'Businesses, B2B', 'Local customers, National reach']}
+                  placeholder="Describe your target audience"
+                  language="en"
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Campaign Goal
-                  </label>
-                  <select
-                    value={formData.campaignGoal}
-                    onChange={(e) => setFormData({...formData, campaignGoal: e.target.value})}
-                    className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white focus:outline-none focus:border-purple-500/50"
-                  >
-                    <option value="">Select Primary Goal</option>
-                    {campaignGoals.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <FlexibleInput
+                  label="Campaign Goal"
+                  type="select"
+                  value={formData.campaignGoal}
+                  onChange={(value) => handleInputChange('campaignGoal', value)}
+                  options={campaignGoals.map(opt => opt.value)}
+                  placeholder="Select Primary Goal"
+                  language="en"
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Geographic Target
-                  </label>
-                  <select
-                    value={formData.geographicTarget}
-                    onChange={(e) => setFormData({...formData, geographicTarget: e.target.value})}
-                    className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white focus:outline-none focus:border-purple-500/50"
-                  >
-                    <option value="">Select Geographic Scope</option>
-                    {geographicTargets.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <FlexibleInput
+                  label="Geographic Target"
+                  type="select"
+                  value={formData.geographicTarget}
+                  onChange={(value) => handleInputChange('geographicTarget', value)}
+                  options={geographicTargets.map(opt => opt.value)}
+                  placeholder="Select Geographic Scope"
+                  language="en"
+                />
 
                 <Button
                   onClick={handleGenerateStrategy}
@@ -1437,13 +1410,30 @@ export default function ComprehensiveStrategyTool() {
               ))}
             </div>
 
-            {/* Output */}
-            <ToolOutput
-              generatedAnalysis={generatedStrategy}
-              isGenerating={isGenerating}
-              title={`${marketingStrategySections.find(s => s.id === activeTab)?.title} Strategy`}
-              language="en"
-            />
+            {/* Output - Only show when results exist */}
+            {results && (
+              <EnhancedResultsDisplay
+                results={results}
+                onReset={() => {
+                  setResults(null)
+                  setFormData({
+                    businessName: '',
+                    industry: '',
+                    budget: '',
+                    duration: '',
+                    targetAudience: '',
+                    campaignGoal: '',
+                    geographicTarget: ''
+                  })
+                }}
+                exportData={{
+                  content: results.content,
+                  format: 'txt',
+                  filename: `${activeTab}-strategy.txt`
+                }}
+                language="en"
+              />
+            )}
           </div>
         </div>
       </div>

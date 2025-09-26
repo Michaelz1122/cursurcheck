@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '@/components/Navigation'
-import ToolOutput from '@/components/ToolOutput'
+import FlexibleInput from '@/components/ui/FlexibleInput'
+import EnhancedResultsDisplay from '@/components/ui/EnhancedResultsDisplay'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -44,6 +45,11 @@ export default function ExternalFactorsEvaluationTool() {
   })
   const [generatedAnalysis, setGeneratedAnalysis] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
+  const [results, setResults] = useState<any>(null)
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
 
   const analysisSections = [
     {
@@ -1504,6 +1510,17 @@ export default function ExternalFactorsEvaluationTool() {
       }
 
       setGeneratedAnalysis(analysis)
+      
+      // Create results object for EnhancedResultsDisplay
+      const newResults = {
+        content: analysis,
+        title: analysisSections.find(s => s.id === activeTab)?.title || 'External Factors Analysis',
+        metrics: [],
+        recommendations: [],
+        score: 85
+      }
+      setResults(newResults)
+      
       setIsGenerating(false)
     }, 2000)
   }
@@ -1540,94 +1557,68 @@ export default function ExternalFactorsEvaluationTool() {
                   Business Information
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Company Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.companyName}
-                    onChange={(e) => setFormData({...formData, companyName: e.target.value})}
-                    className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
-                    placeholder="Enter your company name"
-                  />
-                </div>
+              <CardContent className="space-y-6">
+                <FlexibleInput
+                  label="Company Name"
+                  type="text"
+                  value={formData.companyName}
+                  onChange={(value) => handleInputChange('companyName', value)}
+                  options={['Acme Corp', 'Tech Solutions', 'Global Industries', 'Innovation Labs', 'Future Systems']}
+                  placeholder="Enter your company name"
+                  language="en"
+                  required={true}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Industry
-                  </label>
-                  <select
-                    value={formData.industry}
-                    onChange={(e) => setFormData({...formData, industry: e.target.value})}
-                    className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white focus:outline-none focus:border-purple-500/50"
-                  >
-                    <option value="">Select Industry</option>
-                    {industryOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <FlexibleInput
+                  label="Industry"
+                  type="select"
+                  value={formData.industry}
+                  onChange={(value) => handleInputChange('industry', value)}
+                  options={industryOptions.map(opt => opt.value)}
+                  placeholder="Select Industry"
+                  language="en"
+                  required={true}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Main Competitors
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.mainCompetitors}
-                    onChange={(e) => setFormData({...formData, mainCompetitors: e.target.value})}
-                    className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
-                    placeholder="List your main competitors"
-                  />
-                </div>
+                <FlexibleInput
+                  label="Main Competitors"
+                  type="text"
+                  value={formData.mainCompetitors}
+                  onChange={(value) => handleInputChange('mainCompetitors', value)}
+                  options={['Competitor A, Competitor B', 'Market Leader, Challenger', 'Direct, Indirect competitors']}
+                  placeholder="List your main competitors"
+                  language="en"
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Target Market
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.targetMarket}
-                    onChange={(e) => setFormData({...formData, targetMarket: e.target.value})}
-                    className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
-                    placeholder="Describe your target market"
-                  />
-                </div>
+                <FlexibleInput
+                  label="Target Market"
+                  type="text"
+                  value={formData.targetMarket}
+                  onChange={(value) => handleInputChange('targetMarket', value)}
+                  options={['Young professionals', 'Businesses, B2B', 'Local customers, National reach']}
+                  placeholder="Describe your target market"
+                  language="en"
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Business Goals
-                  </label>
-                  <textarea
-                    value={formData.businessGoals}
-                    onChange={(e) => setFormData({...formData, businessGoals: e.target.value})}
-                    className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
-                    placeholder="Describe your primary business goals"
-                    rows={3}
-                  />
-                </div>
+                <FlexibleInput
+                  label="Business Goals"
+                  type="textarea"
+                  value={formData.businessGoals}
+                  onChange={(value) => handleInputChange('businessGoals', value)}
+                  options={['Increase market share', 'Improve profitability', 'Expand to new markets']}
+                  placeholder="Describe your primary business goals"
+                  language="en"
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Time Frame
-                  </label>
-                  <select
-                    value={formData.timeFrame}
-                    onChange={(e) => setFormData({...formData, timeFrame: e.target.value})}
-                    className="w-full px-3 py-2 bg-black/50 border border-purple-500/30 rounded-lg text-white focus:outline-none focus:border-purple-500/50"
-                  >
-                    <option value="">Select Time Frame</option>
-                    {timeFrameOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <FlexibleInput
+                  label="Time Frame"
+                  type="select"
+                  value={formData.timeFrame}
+                  onChange={(value) => handleInputChange('timeFrame', value)}
+                  options={timeFrameOptions.map(opt => opt.value)}
+                  placeholder="Select Time Frame"
+                  language="en"
+                />
 
                 <Button
                   onClick={handleGenerateAnalysis}
@@ -1675,13 +1666,29 @@ export default function ExternalFactorsEvaluationTool() {
               ))}
             </div>
 
-            {/* Output */}
-            <ToolOutput
-              generatedAnalysis={generatedAnalysis}
-              isGenerating={isGenerating}
-              title={`${analysisSections.find(s => s.id === activeTab)?.title} Analysis`}
-              language="en"
-            />
+            {/* Output - Only show when results exist */}
+            {results && (
+              <EnhancedResultsDisplay
+                results={results}
+                onReset={() => {
+                  setResults(null)
+                  setFormData({
+                    companyName: '',
+                    industry: '',
+                    mainCompetitors: '',
+                    targetMarket: '',
+                    businessGoals: '',
+                    timeFrame: ''
+                  })
+                }}
+                exportData={{
+                  content: results.content,
+                  format: 'txt',
+                  filename: `${activeTab}-analysis.txt`
+                }}
+                language="en"
+              />
+            )}
           </div>
         </div>
       </div>

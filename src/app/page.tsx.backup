@@ -56,7 +56,7 @@ export default function Home() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['home', 'work', 'about', 'services', 'contact']
+      const sections = ['home', 'work', 'about', 'services', 'contact']}
       for (const section of sections) {
         const element = document.getElementById(section)
         if (element) {
@@ -69,8 +69,57 @@ export default function Home() {
       }
     }
 
+    // Handle service selection from URL parameters or localStorage
+    const handlePreselectedService = () => {
+      // Check URL parameters first
+      const urlParams = new URLSearchParams(window.location.search)
+      const serviceFromUrl = urlParams.get('service')
+      const budgetFromUrl = urlParams.get('budget')
+      
+      // Check localStorage as fallback
+      const storedData = localStorage.getItem('preselectedServiceData')
+      let parsedData = null
+      
+      if (storedData) {
+        try {
+          parsedData = JSON.parse(storedData)
+          // Clear localStorage after reading
+          localStorage.removeItem('preselectedServiceData')
+        } catch (e) {
+          console.error('Error parsing stored service data:', e)
+        }
+      }
+      
+      // Update form data with preselected values
+      if (serviceFromUrl || budgetFromUrl || parsedData) {
+        setFormData(prev => ({
+          ...prev,
+          selectedService: serviceFromUrl || parsedData?.selectedService || prev.selectedService,
+          budget: budgetFromUrl || parsedData?.budget || prev.budget
+        }))
+      }
+    }
+
+    // Listen for custom service selection event
+    const handleServiceSelectionEvent = (event) => {
+      const { selectedService, budget } = event.detail
+      setFormData(prev => ({
+        ...prev,
+        selectedService,
+        budget
+      }))
+    }
+
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('serviceSelected', handleServiceSelectionEvent)
+    
+    // Handle preselected service on page load
+    handlePreselectedService()
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('serviceSelected', handleServiceSelectionEvent)
+    }
   }, [])
 
   const stats = [

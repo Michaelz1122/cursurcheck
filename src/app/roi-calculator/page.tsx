@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '@/components/Navigation'
+import FlexibleInput from '@/components/ui/FlexibleInput'
+import EnhancedResultsDisplay from '@/components/ui/EnhancedResultsDisplay'
 import { 
   Calculator, 
   TrendingUp, 
@@ -256,731 +258,395 @@ export default function ROICalculator() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white overflow-hidden relative">
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent"></div>
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse delay-2000"></div>
-      </div>
+        {/* Animated Background Elements */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent"></div>
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse delay-2000"></div>
+        </div>
 
-      <Navigation currentPath="/roi-calculator" />
+        <Navigation currentPath="/roi-calculator" />
 
-      <div className="relative z-40 container mx-auto px-6 pt-24 pb-12">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12"
-        >
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 px-6 py-3 rounded-full mb-6 backdrop-blur-sm border border-purple-500/30">
-            <Calculator className="w-5 h-5" />
-            <span className="text-sm font-medium">Marketing Calculators</span>
-          </div>
-          
-          {/* Tab Navigation */}
-          <div className="flex justify-center mb-8">
-            <div className="bg-white/5 backdrop-blur-md rounded-full p-1 border border-white/10">
-              <button
-                onClick={() => setActiveTab('roi')}
-                className={`px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
-                  activeTab === 'roi'
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                ROI Calculator
-              </button>
-              <button
-                onClick={() => setActiveTab('roas')}
-                className={`px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
-                  activeTab === 'roas'
-                    ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                ROAS Calculator
-              </button>
-            </div>
-          </div>
-
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-            {activeTab === 'roi' ? 'Marketing ROI Calculator' : 'ROAS Calculator'}
-          </h1>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            {activeTab === 'roi' 
-              ? 'Calculate your return on investment, analyze campaign performance, and discover opportunities to maximize your marketing effectiveness.'
-              : 'Calculate your return on ad spend, measure campaign profitability, and optimize your advertising investment for maximum returns.'
-            }
-          </p>
-        </motion.div>
-
-        <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {/* Calculator Form */}
+        <div className="relative z-40 container mx-auto px-6 pt-24 pb-12">
+          {/* Header */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="lg:col-span-2"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
           >
-            <div className="bg-white/5 backdrop-blur-md rounded-3xl p-8 border border-white/10 shadow-2xl">
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  {activeTab === 'roi' ? 'Campaign Data' : 'Ad Performance Data'}
-                </h2>
-                <p className="text-gray-300">
-                  {activeTab === 'roi' 
-                    ? 'Enter your campaign metrics to calculate ROI and performance'
-                    : 'Enter your advertising data to calculate ROAS and profitability'
-                  }
-                </p>
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 px-6 py-3 rounded-full mb-6 backdrop-blur-sm border border-purple-500/30">
+              <Calculator className="w-5 h-5" />
+              <span className="text-sm font-medium">Marketing Calculators</span>
+            </div>
+            
+            {/* Tab Navigation */}
+            <div className="flex justify-center mb-8">
+              <div className="bg-white/5 backdrop-blur-md rounded-full p-1 border border-white/10">
+                <button
+                  onClick={() => setActiveTab('roi')}
+                  className={`px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
+                    activeTab === 'roi'
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  ROI Calculator
+                </button>
+                <button
+                  onClick={() => setActiveTab('roas')}
+                  className={`px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
+                    activeTab === 'roas'
+                      ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  ROAS Calculator
+                </button>
               </div>
+            </div>
 
-              {activeTab === 'roi' ? (
-                !results ? (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Basic Metrics */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-purple-400" />
-                        Monthly Ad Spend *
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400"
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+              {activeTab === 'roi' ? 'Marketing ROI Calculator' : 'ROAS Calculator'}
+            </h1>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              {activeTab === 'roi' 
+                ? 'Calculate your return on investment, analyze campaign performance, and discover opportunities to maximize your marketing effectiveness.'
+                : 'Calculate your return on ad spend, measure campaign profitability, and optimize your advertising investment for maximum returns.'
+              }
+            </p>
+          </motion.div>
+
+          <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {/* Calculator Form */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="lg:col-span-2"
+            >
+              <div className="bg-white/5 backdrop-blur-md rounded-3xl p-8 border border-white/10 shadow-2xl">
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    {activeTab === 'roi' ? 'Campaign Data' : 'Ad Performance Data'}
+                  </h2>
+                  <p className="text-gray-300">
+                    {activeTab === 'roi' 
+                      ? 'Enter your campaign metrics to calculate ROI and performance'
+                      : 'Enter your advertising data to calculate ROAS and profitability'
+                    }
+                  </p>
+                </div>
+
+                {activeTab === 'roi' ? (
+                  !results ? (
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Basic Metrics */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <FlexibleInput
+                        label="Monthly Ad Spend"
+                        type="currency"
                         value={formData.monthlyAdSpend}
-                        onChange={(e) => handleInputChange('monthlyAdSpend', e.target.value)}
+                        onChange={(value) => handleInputChange('monthlyAdSpend', value)}
+                        options={['5000', '10000', '15000', '20000', '25000']}
                         placeholder="5000"
-                        min="0"
-                        step="100"
-                        required
+                        required={true}
+                        language="en"
                       />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <Target className="w-4 h-4 text-purple-400" />
-                        Average Order Value *
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                      
+                      <FlexibleInput
+                        label="Average Order Value"
+                        type="currency"
                         value={formData.averageOrderValue}
-                        onChange={(e) => handleInputChange('averageOrderValue', e.target.value)}
+                        onChange={(value) => handleInputChange('averageOrderValue', value)}
+                        options={['100', '250', '500', '750', '1000']}
                         placeholder="250"
-                        min="0"
-                        step="10"
-                        required
+                        required={true}
+                        language="en"
                       />
                     </div>
-                  </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <Users className="w-4 h-4 text-purple-400" />
-                        Monthly Orders *
-                      </label>
-                      <input
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <FlexibleInput
+                        label="Monthly Orders"
                         type="number"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400"
                         value={formData.monthlyOrders}
-                        onChange={(e) => handleInputChange('monthlyOrders', e.target.value)}
+                        onChange={(value) => handleInputChange('monthlyOrders', value)}
+                        options={['50', '100', '200', '500', '1000']}
                         placeholder="100"
-                        min="0"
-                        step="1"
-                        required
+                        required={true}
+                        language="en"
                       />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <BarChart3 className="w-4 h-4 text-purple-400" />
-                        Conversion Rate (%) *
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                      
+                      <FlexibleInput
+                        label="Conversion Rate"
+                        type="percentage"
                         value={formData.conversionRate}
-                        onChange={(e) => handleInputChange('conversionRate', e.target.value)}
+                        onChange={(value) => handleInputChange('conversionRate', value)}
+                        options={['1', '2.5', '5', '7.5', '10']}
                         placeholder="2.5"
-                        min="0"
-                        max="100"
-                        step="0.1"
-                        required
+                        required={true}
+                        language="en"
                       />
                     </div>
-                  </div>
 
-                  {/* Advanced Metrics */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-purple-400" />
-                        Customer Lifetime Value
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                    {/* Advanced Metrics */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <FlexibleInput
+                        label="Customer Lifetime Value"
+                        type="currency"
                         value={formData.customerLifetimeValue}
-                        onChange={(e) => handleInputChange('customerLifetimeValue', e.target.value)}
+                        onChange={(value) => handleInputChange('customerLifetimeValue', value)}
+                        options={['500', '750', '1000', '1500', '2000']}
                         placeholder="750"
-                        min="0"
-                        step="50"
+                        required={false}
+                        language="en"
                       />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <PieChart className="w-4 h-4 text-purple-400" />
-                        Profit Margin (%)
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                      
+                      <FlexibleInput
+                        label="Profit Margin"
+                        type="percentage"
                         value={formData.profitMargin}
-                        onChange={(e) => handleInputChange('profitMargin', e.target.value)}
+                        onChange={(value) => handleInputChange('profitMargin', value)}
+                        options={['15', '25', '35', '50', '65']}
                         placeholder="30"
-                        min="0"
-                        max="100"
-                        step="1"
+                        required={false}
+                        language="en"
                       />
                     </div>
-                  </div>
 
-                  {/* Context Information */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-purple-400" />
-                        Industry
-                      </label>
-                      <select
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white appearance-none cursor-pointer"
-                        value={formData.industry}
-                        onChange={(e) => handleInputChange('industry', e.target.value)}
-                        style={{
-                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a78bfa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                          backgroundPosition: `right 0.5rem center`,
-                          backgroundRepeat: `no-repeat`,
-                          backgroundSize: `1.5em 1.5em`,
-                          paddingRight: `2.5rem`
-                        }}
-                      >
-                        <option value="" className="bg-gray-900 text-white">Select industry</option>
-                        {industries.map(industry => (
-                          <option key={industry} value={industry} className="bg-gray-900 text-white">{industry}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-purple-400" />
-                        Marketing Channel
-                      </label>
-                      <select
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white appearance-none cursor-pointer"
-                        value={formData.marketingChannel}
-                        onChange={(e) => handleInputChange('marketingChannel', e.target.value)}
-                        style={{
-                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a78bfa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                          backgroundPosition: `right 0.5rem center`,
-                          backgroundRepeat: `no-repeat`,
-                          backgroundSize: `1.5em 1.5em`,
-                          paddingRight: `2.5rem`
-                        }}
-                      >
-                        <option value="" className="bg-gray-900 text-white">Select channel</option>
-                        {channels.map(channel => (
-                          <option key={channel} value={channel} className="bg-gray-900 text-white">{channel}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isCalculating}
-                    className="w-full px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isCalculating ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Calculating...
-                      </>
-                    ) : (
-                      <>
-                        <Calculator className="w-5 h-5" />
-                        Calculate ROI
-                      </>
-                    )}
-                  </button>
-                </form>
-              ) : (
-                /* ROI Results Section */
-                <div className="space-y-8">
-                  {/* Overall Score */}
-                  <div className="text-center">
-                    <div className="mb-6">
-                      <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Award className="w-10 h-10 text-white" />
+                    {/* Context Information */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                          <Activity className="w-4 h-4 text-purple-400" />
+                          Industry
+                        </label>
+                        <select
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white appearance-none cursor-pointer"
+                          value={formData.industry}
+                          onChange={(e) => handleInputChange('industry', e.target.value)}
+                          style={{
+                            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a78bfa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                            backgroundPosition: `right 0.5rem center`,
+                            backgroundRepeat: `no-repeat`,
+                            backgroundSize: `1.5em 1.5em`,
+                            paddingRight: `2.5rem`
+                          }}
+                        >
+                          <option value="" className="bg-gray-900 text-white">Select industry</option>
+                          {industries.map(industry => (
+                            <option key={industry} value={industry} className="bg-gray-900 text-white">{industry}</option>
+                          ))}
+                        </select>
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-2">ROI Analysis Complete</h3>
-                      <p className="text-gray-300">Your campaign performance breakdown</p>
-                    </div>
-
-                    <div className="mb-6">
-                      <div className="text-6xl font-bold mb-2">
-                        <span className={getScoreColor(parseFloat(results.overallScore))}>{results.overallScore}</span>
-                        <span className="text-gray-400 text-3xl">/100</span>
-                      </div>
-                      <div className={`text-xl font-semibold mb-4 ${getScoreColor(parseFloat(results.overallScore))}`}>
-                        {getScoreLabel(parseFloat(results.overallScore))} Performance
-                      </div>
-                      <div className="w-full bg-white/10 rounded-full h-3">
-                        <div 
-                          className={`h-3 rounded-full transition-all duration-1000 ${
-                            parseFloat(results.overallScore) >= 80 ? 'bg-green-500' :
-                            parseFloat(results.overallScore) >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-                          }`}
-                          style={{ width: `${results.overallScore}%` }}
-                        ></div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                          <Zap className="w-4 h-4 text-purple-400" />
+                          Marketing Channel
+                        </label>
+                        <select
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 text-white appearance-none cursor-pointer"
+                          value={formData.marketingChannel}
+                          onChange={(e) => handleInputChange('marketingChannel', e.target.value)}
+                          style={{
+                            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a78bfa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                            backgroundPosition: `right 0.5rem center`,
+                            backgroundRepeat: `no-repeat`,
+                            backgroundSize: `1.5em 1.5em`,
+                            paddingRight: `2.5rem`
+                          }}
+                        >
+                          <option value="" className="bg-gray-900 text-white">Select channel</option>
+                          {channels.map(channel => (
+                            <option key={channel} value={channel} className="bg-gray-900 text-white">{channel}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Key Metrics */}
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 p-4 rounded-xl border border-purple-500/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <TrendingUp className="w-4 h-4 text-purple-400" />
-                        <span className="text-sm text-purple-300">ROI</span>
-                      </div>
-                      <div className="text-2xl font-bold text-white">{results.roi}%</div>
-                      <div className="text-xs text-gray-400">Return on Investment</div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 p-4 rounded-xl border border-blue-500/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <BarChart3 className="w-4 h-4 text-blue-400" />
-                        <span className="text-sm text-blue-300">ROAS</span>
-                      </div>
-                      <div className="text-2xl font-bold text-white">{results.roas}x</div>
-                      <div className="text-xs text-gray-400">Return on Ad Spend</div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 p-4 rounded-xl border border-green-500/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Users className="w-4 h-4 text-green-400" />
-                        <span className="text-sm text-green-300">CAC</span>
-                      </div>
-                      <div className="text-2xl font-bold text-white">{formatCurrency(results.cac)}</div>
-                      <div className="text-xs text-gray-400">Customer Acquisition Cost</div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 p-4 rounded-xl border border-yellow-500/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Target className="w-4 h-4 text-yellow-400" />
-                        <span className="text-sm text-yellow-300">Break-even</span>
-                      </div>
-                      <div className="text-2xl font-bold text-white">{results.breakEvenOrders}</div>
-                      <div className="text-xs text-gray-400">Orders Needed</div>
-                    </div>
-                  </div>
-
-                  {/* Financial Summary */}
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                      <div className="text-sm text-gray-400 mb-1">Monthly Revenue</div>
-                      <div className="text-xl font-bold text-white">{formatCurrency(results.monthlyRevenue)}</div>
-                    </div>
-                    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                      <div className="text-sm text-gray-400 mb-1">Monthly Profit</div>
-                      <div className="text-xl font-bold text-white">{formatCurrency(results.monthlyProfit)}</div>
-                    </div>
-                    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                      <div className="text-sm text-gray-400 mb-1">Net Profit</div>
-                      <div className={`text-xl font-bold ${parseFloat(results.netProfit) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {formatCurrency(results.netProfit)}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Strengths and Recommendations */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6">
-                      <h4 className="text-lg font-semibold text-green-400 mb-4 flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5" />
-                        Strengths
-                      </h4>
-                      <ul className="space-y-2">
-                        {results.strengths.map((strength: string, index: number) => (
-                          <li key={index} className="flex items-start gap-2 text-green-300">
-                            <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <span className="text-sm">{strength}</span>
-                          </li>
-                        ))}
-                        {results.strengths.length === 0 && (
-                          <li className="text-gray-400 text-sm">No significant strengths identified</li>
-                        )}
-                      </ul>
-                    </div>
-
-                    <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-6">
-                      <h4 className="text-lg font-semibold text-blue-400 mb-4 flex items-center gap-2">
-                        <AlertCircle className="w-5 h-5" />
-                        Recommendations
-                      </h4>
-                      <ul className="space-y-2">
-                        {results.recommendations.map((rec: string, index: number) => (
-                          <li key={index} className="flex items-start gap-2 text-blue-300">
-                            <ArrowRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <span className="text-sm">{rec}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4 justify-center">
                     <button
-                      onClick={() => {
-                        setResults(null)
-                        setFormData({
-                          monthlyAdSpend: '',
-                          averageOrderValue: '',
-                          monthlyOrders: '',
-                          conversionRate: '',
-                          customerLifetimeValue: '',
-                          profitMargin: '',
-                          industry: '',
-                          marketingChannel: ''
-                        })
-                      }}
-                      className="px-6 py-3 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-all duration-300"
+                      type="submit"
+                      disabled={isCalculating}
+                      className="w-full px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      New Calculation
+                      {isCalculating ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Calculating...
+                        </>
+                      ) : (
+                        <>
+                          <Calculator className="w-5 h-5" />
+                          Calculate ROI
+                        </>
+                      )}
                     </button>
-                    <button 
-                      onClick={() => {
-                        // Generate and download report
-                        const reportData = {
-                          type: 'ROI Analysis',
-                          date: new Date().toLocaleDateString(),
-                          results: results
-                        }
-                        const dataStr = JSON.stringify(reportData, null, 2)
-                        const dataBlob = new Blob([dataStr], {type: 'application/json'})
-                        const url = URL.createObjectURL(dataBlob)
-                        const link = document.createElement('a')
-                        link.href = url
-                        link.download = 'roi-analysis-report.json'
-                        link.click()
-                        URL.revokeObjectURL(url)
-                      }}
-                      className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 flex items-center gap-2"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download Report
-                    </button>
-                  </div>
-                </div>
-              )
-            ) : (
-              <>
-              {/* ROAS Form */}
-              {!roasResults ? (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Basic ROAS Metrics */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-blue-400" />
-                        Ad Spend *
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                  </form>
+                ) : (
+                  /* ROI Results Section */
+                  <EnhancedResultsDisplay
+                    title="ROI Analysis Complete"
+                    subtitle="Your campaign performance breakdown"
+                    results={results}
+                    language="en"
+                    toolType="roi-calculator"
+                    onNewCalculation={() => {
+                      setResults(null)
+                      setFormData({
+                        monthlyAdSpend: '',
+                        averageOrderValue: '',
+                        monthlyOrders: '',
+                        conversionRate: '',
+                        customerLifetimeValue: '',
+                        profitMargin: '',
+                        industry: '',
+                        marketingChannel: ''
+                      })
+                    }}
+                  />
+                )
+              ) : (
+                <>
+                {/* ROAS Form */}
+                {!roasResults ? (
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Basic ROAS Metrics */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <FlexibleInput
+                        label="Ad Spend"
+                        type="currency"
                         value={roasData.adSpend}
-                        onChange={(e) => handleRoasChange('adSpend', e.target.value)}
+                        onChange={(value) => handleRoasChange('adSpend', value)}
+                        options={['1000', '2500', '5000', '10000', '15000']}
                         placeholder="5000"
-                        min="0"
-                        step="100"
-                        required
+                        required={true}
+                        language="en"
                       />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-blue-400" />
-                        Revenue Generated *
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                      
+                      <FlexibleInput
+                        label="Revenue Generated"
+                        type="currency"
                         value={roasData.revenue}
-                        onChange={(e) => handleRoasChange('revenue', e.target.value)}
+                        onChange={(value) => handleRoasChange('revenue', value)}
+                        options={['5000', '10000', '15000', '25000', '50000']}
                         placeholder="15000"
-                        min="0"
-                        step="100"
-                        required
+                        required={true}
+                        language="en"
                       />
                     </div>
-                  </div>
 
-                  {/* Campaign Details */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <Target className="w-4 h-4 text-blue-400" />
-                        Campaign Name
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-white placeholder-gray-400"
-                        value={roasData.campaignName}
-                        onChange={(e) => handleRoasChange('campaignName', e.target.value)}
-                        placeholder="Summer Sale Campaign"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-blue-400" />
-                        Platform
-                      </label>
-                      <select
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-white appearance-none cursor-pointer"
-                        value={roasData.platform}
-                        onChange={(e) => handleRoasChange('platform', e.target.value)}
-                        style={{
-                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2360a5fa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                          backgroundPosition: `right 0.5rem center`,
-                          backgroundRepeat: `no-repeat`,
-                          backgroundSize: `1.5em 1.5em`,
-                          paddingRight: `2.5rem`
-                        }}
-                      >
-                        <option value="" className="bg-gray-900 text-white">Select platform</option>
-                        <option value="Facebook Ads" className="bg-gray-900 text-white">Facebook Ads</option>
-                        <option value="Google Ads" className="bg-gray-900 text-white">Google Ads</option>
-                        <option value="Instagram" className="bg-gray-900 text-white">Instagram</option>
-                        <option value="LinkedIn" className="bg-gray-900 text-white">LinkedIn</option>
-                        <option value="TikTok" className="bg-gray-900 text-white">TikTok</option>
-                        <option value="Other" className="bg-gray-900 text-white">Other</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-blue-400" />
-                        Campaign Duration (days)
-                      </label>
-                      <select
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-white appearance-none cursor-pointer"
-                        value={roasData.duration}
-                        onChange={(e) => handleRoasChange('duration', e.target.value)}
-                        style={{
-                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2360a5fa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                          backgroundPosition: `right 0.5rem center`,
-                          backgroundRepeat: `no-repeat`,
-                          backgroundSize: `1.5em 1.5em`,
-                          paddingRight: `2.5rem`
-                        }}
-                      >
-                        <option value="7" className="bg-gray-900 text-white">7 days</option>
-                        <option value="14" className="bg-gray-900 text-white">14 days</option>
-                        <option value="30" className="bg-gray-900 text-white">30 days</option>
-                        <option value="60" className="bg-gray-900 text-white">60 days</option>
-                        <option value="90" className="bg-gray-900 text-white">90 days</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isCalculating}
-                    className="w-full px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isCalculating ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Calculating...
-                      </>
-                    ) : (
-                      <>
-                        <Calculator className="w-5 h-5" />
-                        Calculate ROAS
-                      </>
-                    )}
-                  </button>
-                </form>
-              ) : (
-                /* ROAS Results Section */
-                <div className="space-y-8">
-                  {/* Overall Score */}
-                  <div className="text-center">
-                    <div className="mb-6">
-                      <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Award className="w-10 h-10 text-white" />
+                    {/* Campaign Details */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                          <Target className="w-4 h-4 text-blue-400" />
+                          Campaign Name
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-white placeholder-gray-400"
+                          value={roasData.campaignName}
+                          onChange={(e) => handleRoasChange('campaignName', e.target.value)}
+                          placeholder="Summer Sale Campaign"
+                        />
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-2">ROAS Analysis Complete</h3>
-                      <p className="text-gray-300">Your ad performance breakdown</p>
-                    </div>
-
-                    <div className="mb-6">
-                      <div className="text-6xl font-bold mb-2">
-                        <span className={getScoreColor(parseFloat(roasResults.efficiencyScore))}>{roasResults.efficiencyScore}</span>
-                        <span className="text-gray-400 text-3xl">/100</span>
-                      </div>
-                      <div className={`text-xl font-semibold mb-4 ${getScoreColor(parseFloat(roasResults.efficiencyScore))}`}>
-                        {getScoreLabel(parseFloat(roasResults.efficiencyScore))} Performance
-                      </div>
-                      <div className="w-full bg-white/10 rounded-full h-3">
-                        <div 
-                          className={`h-3 rounded-full transition-all duration-1000 ${
-                            parseFloat(roasResults.efficiencyScore) >= 80 ? 'bg-green-500' :
-                            parseFloat(roasResults.efficiencyScore) >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-                          }`}
-                          style={{ width: `${roasResults.efficiencyScore}%` }}
-                        ></div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                          <Zap className="w-4 h-4 text-blue-400" />
+                          Platform
+                        </label>
+                        <select
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-white appearance-none cursor-pointer"
+                          value={roasData.platform}
+                          onChange={(e) => handleRoasChange('platform', e.target.value)}
+                          style={{
+                            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2360a5fa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                            backgroundPosition: `right 0.5rem center`,
+                            backgroundRepeat: `no-repeat`,
+                            backgroundSize: `1.5em 1.5em`,
+                            paddingRight: `2.5rem`
+                          }}
+                        >
+                          <option value="" className="bg-gray-900 text-white">Select platform</option>
+                          <option value="Facebook Ads" className="bg-gray-900 text-white">Facebook Ads</option>
+                          <option value="Google Ads" className="bg-gray-900 text-white">Google Ads</option>
+                          <option value="Instagram" className="bg-gray-900 text-white">Instagram</option>
+                          <option value="LinkedIn" className="bg-gray-900 text-white">LinkedIn</option>
+                          <option value="TikTok" className="bg-gray-900 text-white">TikTok</option>
+                          <option value="Other" className="bg-gray-900 text-white">Other</option>
+                        </select>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Key Metrics */}
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 p-4 rounded-xl border border-blue-500/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <BarChart3 className="w-4 h-4 text-blue-400" />
-                        <span className="text-sm text-blue-300">ROAS</span>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                          <Activity className="w-4 h-4 text-blue-400" />
+                          Campaign Duration (days)
+                        </label>
+                        <select
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 text-white appearance-none cursor-pointer"
+                          value={roasData.duration}
+                          onChange={(e) => handleRoasChange('duration', e.target.value)}
+                          style={{
+                            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2360a5fa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                            backgroundPosition: `right 0.5rem center`,
+                            backgroundRepeat: `no-repeat`,
+                            backgroundSize: `1.5em 1.5em`,
+                            paddingRight: `2.5rem`
+                          }}
+                        >
+                          <option value="7" className="bg-gray-900 text-white">7 days</option>
+                          <option value="14" className="bg-gray-900 text-white">14 days</option>
+                          <option value="30" className="bg-gray-900 text-white">30 days</option>
+                          <option value="60" className="bg-gray-900 text-white">60 days</option>
+                          <option value="90" className="bg-gray-900 text-white">90 days</option>
+                        </select>
                       </div>
-                      <div className="text-2xl font-bold text-white">{roasResults.roas}x</div>
-                      <div className="text-xs text-gray-400">Return on Ad Spend</div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 p-4 rounded-xl border border-green-500/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <DollarSign className="w-4 h-4 text-green-400" />
-                        <span className="text-sm text-green-300">Profit</span>
-                      </div>
-                      <div className="text-2xl font-bold text-white">{formatCurrency(roasResults.profit)}</div>
-                      <div className="text-xs text-gray-400">Net Profit</div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 p-4 rounded-xl border border-purple-500/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <PieChart className="w-4 h-4 text-purple-400" />
-                        <span className="text-sm text-purple-300">Margin</span>
-                      </div>
-                      <div className="text-2xl font-bold text-white">{roasResults.profitMargin}%</div>
-                      <div className="text-xs text-gray-400">Profit Margin</div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 p-4 rounded-xl border border-yellow-500/30">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Activity className="w-4 h-4 text-yellow-400" />
-                        <span className="text-sm text-yellow-300">Daily ROAS</span>
-                      </div>
-                      <div className="text-2xl font-bold text-white">{roasResults.dailyROAS}x</div>
-                      <div className="text-xs text-gray-400">Daily Performance</div>
-                    </div>
-                  </div>
-
-                  {/* Financial Summary */}
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                      <div className="text-sm text-gray-400 mb-1">Total Ad Spend</div>
-                      <div className="text-xl font-bold text-white">{formatCurrency(roasData.adSpend)}</div>
-                    </div>
-                    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                      <div className="text-sm text-gray-400 mb-1">Total Revenue</div>
-                      <div className="text-xl font-bold text-white">{formatCurrency(roasData.revenue)}</div>
-                    </div>
-                    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                      <div className="text-sm text-gray-400 mb-1">Daily Spend</div>
-                      <div className="text-xl font-bold text-white">{formatCurrency(roasResults.dailyAdSpend)}</div>
-                    </div>
-                  </div>
-
-                  {/* Strengths and Recommendations */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6">
-                      <h4 className="text-lg font-semibold text-green-400 mb-4 flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5" />
-                        Strengths
-                      </h4>
-                      <ul className="space-y-2">
-                        {roasResults.strengths.map((strength: string, index: number) => (
-                          <li key={index} className="flex items-start gap-2 text-green-300">
-                            <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <span className="text-sm">{strength}</span>
-                          </li>
-                        ))}
-                        {roasResults.strengths.length === 0 && (
-                          <li className="text-gray-400 text-sm">No significant strengths identified</li>
-                        )}
-                      </ul>
-                    </div>
-
-                    <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-6">
-                      <h4 className="text-lg font-semibold text-blue-400 mb-4 flex items-center gap-2">
-                        <AlertCircle className="w-5 h-5" />
-                        Recommendations
-                      </h4>
-                      <ul className="space-y-2">
-                        {roasResults.recommendations.map((rec: string, index: number) => (
-                          <li key={index} className="flex items-start gap-2 text-blue-300">
-                            <ArrowRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <span className="text-sm">{rec}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4 justify-center">
                     <button
-                      onClick={() => {
-                        setRoasResults(null)
-                        setRoasData({
-                          adSpend: '',
-                          revenue: '',
-                          campaignName: '',
-                          platform: '',
-                          duration: '30'
-                        })
-                      }}
-                      className="px-6 py-3 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-all duration-300"
+                      type="submit"
+                      disabled={isCalculating}
+                      className="w-full px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      New Calculation
+                      {isCalculating ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Calculating...
+                        </>
+                      ) : (
+                        <>
+                          <Calculator className="w-5 h-5" />
+                          Calculate ROAS
+                        </>
+                      )}
                     </button>
-                    <button 
-                      onClick={() => {
-                        // Generate and download ROAS report
-                        const reportData = {
-                          type: 'ROAS Analysis',
-                          date: new Date().toLocaleDateString(),
-                          results: roasResults
-                        }
-                        const dataStr = JSON.stringify(reportData, null, 2)
-                        const dataBlob = new Blob([dataStr], {type: 'application/json'})
-                        const url = URL.createObjectURL(dataBlob)
-                        const link = document.createElement('a')
-                        link.href = url
-                        link.download = 'roas-analysis-report.json'
-                        link.click()
-                        URL.revokeObjectURL(url)
-                      }}
-                      className="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 flex items-center gap-2"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download Report
-                    </button>
-                  </div>
-                </div>
+                  </form>
+                ) : (
+                  /* ROAS Results Section */
+                  <EnhancedResultsDisplay
+                    title="ROAS Analysis Complete"
+                    subtitle="Your ad performance breakdown"
+                    results={roasResults}
+                    language="en"
+                    toolType="roas-calculator"
+                    onNewCalculation={() => {
+                      setRoasResults(null)
+                      setRoasData({
+                        adSpend: '',
+                        revenue: '',
+                        campaignName: '',
+                        platform: '',
+                        duration: '30'
+                      })
+                    }}
+                  />
+                )}
+                </>
               )}
-              </>
-            )}
             </div>
           </motion.div>
 

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -167,3 +168,271 @@
     --contact-card-subtitle: oklch(0.556 0 0);
   }
 } */
+
+/* RTL and Arabic Support */
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Arabic Typography Enhancements */
+.font-arabic {
+  font-family: 'Noto Sans Arabic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.font-english {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* RTL-specific fixes */
+.rtl .ml-auto {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+.rtl .mr-auto {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.rtl .pl-4 {
+  padding-right: 1rem;
+  padding-left: 0;
+}
+
+.rtl .pr-4 {
+  padding-left: 1rem;
+  padding-right: 0;
+}
+
+.rtl .border-l-4 {
+  border-right-width: 4px;
+  border-left-width: 0;
+}
+
+.rtl .border-r-4 {
+  border-left-width: 4px;
+  border-right-width: 0;
+}
+
+/* Input RTL fixes */
+.rtl input[type="text"],
+.rtl input[type="number"],
+.rtl input[type="email"],
+.rtl textarea {
+  text-align: right;
+}
+
+.rtl select {
+  text-align: right;
+}
+
+/* Custom scrollbar for RTL content */
+.rtl ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.rtl ::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.rtl ::-webkit-scrollbar-thumb {
+  background: rgba(147, 51, 234, 0.5);
+  border-radius: 4px;
+}
+
+.rtl ::-webkit-scrollbar-thumb:hover {
+  background: rgba(147, 51, 234, 0.7);
+}
+
+/* Arabic text enhancements */
+.arabic-text {
+  font-family: 'Noto Sans Arabic', sans-serif;
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+  font-weight: 400;
+}
+
+.arabic-heading {
+  font-family: 'Noto Sans Arabic', sans-serif;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* Responsive RTL adjustments */
+@media (max-width: 768px) {
+  .rtl .text-right {
+    text-align: right !important;
+  }
+  
+  .rtl .text-left {
+    text-align: left !important;
+  }
+}
+
+/* Form elements RTL styling */
+.rtl .form-label {
+  text-align: right;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.rtl .form-input {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl .select-wrapper select {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Button RTL fixes */
+.rtl .btn {
+  direction: rtl;
+}
+
+.rtl .btn i {
+  margin-left: 0.5rem;
+  margin-right: 0;
+}
+
+/* Card RTL fixes */
+.rtl .card {
+  direction: rtl;
+}
+
+.rtl .card-body {
+  text-align: right;
+}
+
+/* Table RTL fixes */
+.rtl table {
+  direction: rtl;
+}
+
+.rtl th,
+.rtl td {
+  text-align: right;
+}
+
+.rtl th:first-child,
+.rtl td:first-child {
+  text-align: right;
+}
+
+/* Navigation RTL fixes */
+.rtl .nav-item {
+  direction: rtl;
+}
+
+.rtl .dropdown-menu {
+  direction: rtl;
+  text-align: right;
+  right: 0;
+  left: auto;
+}
+
+/* Utility classes for RTL switching */
+.force-rtl {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.force-ltr {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Arabic number formatting */
+.arabic-numbers {
+  font-family: 'Noto Sans Arabic', sans-serif;
+  font-variant-numeric: arabic-indic;
+}
+
+/* Enhanced Arabic typography */
+.arabic-content {
+  font-family: 'Noto Sans Arabic', sans-serif;
+  font-size: 1rem;
+  line-height: 1.8;
+  font-weight: 400;
+  color: #e2e8f0;
+  text-align: right;
+}
+
+.arabic-content h1,
+.arabic-content h2,
+.arabic-content h3,
+.arabic-content h4,
+.arabic-content h5,
+.arabic-content h6 {
+  font-family: 'Noto Sans Arabic', sans-serif;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.arabic-content p {
+  margin-bottom: 1rem;
+  text-align: right;
+}
+
+.arabic-content ul,
+.arabic-content ol {
+  margin-right: 1.5rem;
+  margin-left: 0;
+}
+
+.arabic-content li {
+  margin-bottom: 0.5rem;
+  text-align: right;
+}
+
+/* RTL Animation fixes */
+.rtl .animate-slide-right {
+  animation: slideRightRTL 0.3s ease-out;
+}
+
+.rtl .animate-slide-left {
+  animation: slideLeftRTL 0.3s ease-out;
+}
+
+@keyframes slideRightRTL {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideLeftRTL {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Print RTL support */
+@media print {
+  .rtl {
+    direction: rtl;
+    text-align: right;
+  }
+  
+  .arabic-content {
+    font-family: 'Noto Sans Arabic', sans-serif;
+    direction: rtl;
+    text-align: right;
+  }
+}

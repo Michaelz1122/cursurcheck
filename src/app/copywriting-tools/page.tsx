@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '@/components/Navigation'
+import FlexibleInput from '@/components/ui/FlexibleInput'
+import EnhancedResultsDisplay from '@/components/ui/EnhancedResultsDisplay'
 import { Button } from '@/components/ui/button'
 import { 
   PenTool, 
@@ -34,6 +36,7 @@ export default function CopywritingTools() {
   })
   const [generatedCopy, setGeneratedCopy] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
+  const [results, setResults] = useState<any>(null)
 
   const copywritingTools = [
     {
@@ -130,6 +133,17 @@ export default function CopywritingTools() {
       }
       
       setGeneratedCopy(copy)
+      
+      // Create results object for EnhancedResultsDisplay
+      const newResults = {
+        content: copy,
+        title: copywritingTools.find(t => t.id === activeTab)?.title || 'Copywriting Tool',
+        metrics: [],
+        recommendations: [],
+        score: 85
+      }
+      setResults(newResults)
+      
       setIsGenerating(false)
     }, 2000)
   }
@@ -561,31 +575,27 @@ ${formData.cta ? `📞 ${formData.cta}` : '📞 Ready to transform your business
                   Generated Copy
                 </h3>
                 
-                {generatedCopy ? (
-                  <div className="space-y-6">
-                    <div className="bg-white/10 rounded-lg p-6 border border-white/20">
-                      <div className="text-white whitespace-pre-wrap leading-relaxed">
-                        {generatedCopy}
-                      </div>
-                    </div>
-                    
-                    <div className="flex gap-4">
-                      <Button
-                        onClick={copyToClipboard}
-                        variant="outline"
-                      >
-                        <Copy className="w-5 h-5 mr-2" />
-                        Copy
-                      </Button>
-                      <Button
-                        onClick={downloadAsText}
-                        variant="outline"
-                      >
-                        <Download className="w-5 h-5 mr-2" />
-                        Download
-                      </Button>
-                    </div>
-                  </div>
+                {results ? (
+                  <EnhancedResultsDisplay
+                    results={results}
+                    onReset={() => {
+                      setResults(null)
+                      setFormData({
+                        product: '',
+                        audience: '',
+                        tone: 'professional',
+                        length: 'medium',
+                        keyPoints: '',
+                        cta: ''
+                      })
+                    }}
+                    exportData={{
+                      content: results.content,
+                      format: 'txt',
+                      filename: `${activeTab}-copy.txt`
+                    }}
+                    language="en"
+                  />
                 ) : (
                   <div className="text-center py-12">
                     <Star className="w-16 h-16 mx-auto mb-4 text-gray-400" />
