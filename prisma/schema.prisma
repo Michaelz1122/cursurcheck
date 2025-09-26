@@ -10,17 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Admin User (Single admin)
-model Admin {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@map("admins")
-}
+
 
 // Pages Management
 model Page {

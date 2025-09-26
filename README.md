@@ -1,281 +1,232 @@
-# Admin Dashboard - Next.js
+# Marketing Agency Website - Next.js
 
-لوحة تحكم متكاملة لمواقع Next.js مع نظام إدارة محتوى متقدم وأدوات ذكاء اصطناعي.
+A professional marketing agency website built with Next.js 15, featuring comprehensive marketing tools, calculators, and multi-language support (English/Arabic).
 
-## 🌟 المميزات
+## 🌟 Features
 
-### 🔐 نظام المصادقة
-- تسجيل دخول لمدير واحد فقط
-- إمكانية تغيير كلمة المرور من لوحة التحكم
-- جلسات آمنة مع انتهاء الصلاحية
-- حماية ضد هجمات CSRF و XSS
+### 🎯 Marketing Tools & Calculators
+- **ROI Calculator** - Calculate return on investment for marketing campaigns
+- **CAC Calculator** - Customer acquisition cost analysis
+- **LTV Calculator** - Customer lifetime value calculation
+- **Ad Budget Calculator** - Plan your advertising budget effectively
+- **A/B Test Calculator** - Determine statistical significance of test results
+- **Break-even Calculator** - Find your break-even point
+- **Conversion Rate Calculator** - Analyze and optimize conversion rates
 
-### 📄 إدارة الصفحات
-- إنشاء/تعديل/حذف الصفحات بسهولة
-- محرر Block-based متقدم
-- إعدادات SEO كاملة لكل صفحة
-- دعم النشر وإلغاء النشر
+### 📊 Strategy Tools
+- **Marketing Strategy Tool** - Comprehensive strategy development
+- **Media Buying Plan Tool** - Plan media buying campaigns
+- **Creative Optimization Tool** - Optimize ad creatives
+- **Metrics Analysis Tool** - Analyze marketing metrics
+- **External Factors Evaluation Tool** - Assess external market factors
+- **Comprehensive Strategy Tool** - All-in-one strategy planning
 
-### 🎨 Landing Page Builder
-- محرر سحب وإفلات متطور
-- مكونات جاهزة: Hero, Features, Pricing, Testimonials, Contact Form, Custom HTML
-- معاينة مباشرة أثناء البناء
-- نشر وإلغاء النشر بضغطة زر
+### 📝 Content Tools
+- **Copywriting Tools** - Enhance your marketing copy
+- **Google Sheets & Docs Tools** - Integration with Google Workspace
 
-### 🤖 AI Tool Builder
-- إنشاء أدوات ذكاء اصطناعي مخصصة
-- حقول إدخال مرنة
-- إدارة البرومبتات مع حفظ النسخ السابقة
-- واجهة اختبار مدمجة
-- إعدادات LLM متقدمة
+### 🌍 Multi-Language Support
+- Complete English and Arabic versions
+- RTL (Right-to-Left) support for Arabic
+- Localized content and tools
 
-### 📊 Pixel & Script Injection
-- إضافة أكواد تتبع Global أو per-page
-- اختيار موضع التثبيت (head, body_start, body_end)
-- إعداد قواعد شرطية بسيطة
-- زر تفعيل/تعطيل سريع
-- شاشة Debug متكاملة
+### 🎨 Modern Design
+- Responsive design with Tailwind CSS
+- Professional UI with shadcn/ui components
+- Smooth animations with Framer Motion
+- Dark theme with gradient accents
 
-### ⚙️ الإعدادات
-- تغيير بيانات تسجيل الدخول
-- تخزين مفاتيح API بأمان
-- إعدادات عامة للموقع
-- إعدادات الأمان المتقدمة
+## 🛠️ Technologies Used
 
-## 🛠️ التقنيات المستخدمة
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS 4, shadcn/ui components
+- **Database**: SQLite with Prisma ORM
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **State Management**: Zustand, TanStack Query
+- **Real-time**: Socket.IO
 
-- **Frontend**: Next.js 15, React, TypeScript
-- **Styling**: Tailwind CSS, shadcn/ui
-- **Database**: SQLite مع Prisma ORM
-- **Authentication**: JWT Tokens
-- **Security**: bcryptjs, DOMPurify, CSRF Protection
-- **AI Integration**: z-ai-web-dev-sdk
-- **State Management**: React Hooks
-
-## 📁 هيكل المشروع
+## 📁 Project Structure
 
 ```
 src/
-├── app/
-│   ├── admin/                    # لوحة التحكم
-│   │   ├── login/                # صفحة تسجيل الدخول
-│   │   ├── dashboard/            # الصفحة الرئيسية
-│   │   ├── pages/                # إدارة الصفحات
-│   │   ├── landing-pages/        # بناء الصفحات الهبوطية
-│   │   ├── ai-tools/             # بناء أدوات AI
-│   │   ├── scripts/              # إدارة السكربتات
-│   │   └── settings/             # الإعدادات
-│   ├── api/
-│   │   ├── auth/                 # واجهات المصادقة
-│   │   ├── pages/                # واجهات إدارة الصفحات
-│   │   ├── landing-pages/        # واجهات الصفحات الهبوطية
-│   │   ├── ai-tools/             # واجهات أدوات AI
-│   │   ├── scripts/              # واجهات السكربتات
-│   │   ├── settings/             # واجهات الإعدادات
-│   │   ├── dashboard/            # واجهات الإحصائيات
-│   │   └── admin/                # واجهات تهيئة النظام
-│   └── layout.tsx               # التخطيط الرئيسي
+├── app/                          # Next.js App Router
+│   ├── [calculator-name]/        # Calculator pages
+│   ├── [calculator-name]-ar/      # Arabic versions
+│   ├── tools/                    # Tools overview page
+│   ├── api/                      # API routes
+│   ├── layout.tsx               # Root layout
+│   └── page.tsx                 # Homepage
 ├── components/
-│   └── ui/                      # مكونات واجهة المستخدم
+│   ├── ui/                      # shadcn/ui components
+│   ├── Navigation.tsx           # Main navigation
+│   ├── Logo.tsx                 # Company logo
+│   └── [other components]       # Custom components
 ├── hooks/
-│   └── useAuth.tsx              # هوك المصادقة
+│   ├── use-mobile.ts           # Mobile detection hook
+│   └── use-toast.ts            # Toast notifications
 ├── lib/
-│   ├── auth.ts                  # وظائف المصادقة
-│   ├── db.ts                    # اتصال قاعدة البيانات
-│   ├── security.ts              # وظائف الأمان
-│   └── utils.ts                 # وظائف مساعدة
+│   ├── db.ts                    # Database connection
+│   ├── utils.ts                 # Utility functions
+│   └── socket.ts                # Socket.IO setup
 └── prisma/
-    └── schema.prisma            # مخطط قاعدة البيانات
+    └── schema.prisma            # Database schema
 ```
 
-## 🚀 خطوات التشغيل المحلي
+## 🚀 Local Development
 
-### المتطلبات الأساسية
-- Node.js 18+ 
-- npm أو yarn
+### Prerequisites
+- Node.js 18+
+- npm or yarn
 
-### 1. تثبيت المشروع
+### 1. Install Dependencies
 ```bash
-git clone <repository-url>
-cd admin-dashboard
 npm install
 ```
 
-### 2. إعداد قاعدة البيانات
+### 2. Set Up Database
 ```bash
-# إنشاء قاعدة البيانات
+# Create database schema
 npm run db:push
-
-# (اختياري) فتح Prisma Studio للتصفح
-npx prisma studio
 ```
 
-### 3. إعداد المتغيرات البيئية
-أنشئ ملف `.env.local` في جذر المشروع:
+### 3. Set Up Environment Variables
+Create a `.env.local` file in the project root:
 
 ```env
-# قاعدة البيانات
+# Database
 DATABASE_URL="file:./dev.db"
 
-# سر JWT (استخدم قيمة عشوائية قوية)
-JWT_SECRET="your-super-secret-jwt-key-here"
-
-# مفاتيح API (اختياري)
+# Optional: AI Integration
 OPENAI_API_KEY="your-openai-api-key"
 ```
 
-### 4. تهيئة حساب المدير
-قبل استخدام لوحة التحكم، يجب إنشاء حساب المدير:
-
-```bash
-# أرسل طلب POST لإنشاء حساب المدير
-curl -X POST http://localhost:3000/api/admin/init \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@example.com",
-    "password": "your-secure-password",
-    "name": "Admin User"
-  }'
-```
-
-### 5. تشغيل خادم التطوير
+### 4. Start Development Server
 ```bash
 npm run dev
 ```
 
-### 6. الوصول إلى لوحة التحكم
-- افتح المتصفح على `http://localhost:3000/admin/login`
-- سجل الدخول باستخدام البريد الإلكتروني وكلمة المرور التي أنشأتها
+### 5. Access the Website
+- Open your browser to `http://localhost:3000`
+- The website will be running with all marketing tools and features
 
-## 🌐 خطوات النشر
+## 🌐 Deployment
 
-### النشر على Vercel
+### Vercel Deployment
 
-#### 1. إعداد Vercel
+#### 1. Install Vercel CLI
 ```bash
-# تثبيت Vercel CLI
 npm i -g vercel
-
-# تسجيل الدخول إلى Vercel
 vercel login
 ```
 
-#### 2. إعداد متغيرات البيئة على Vercel
+#### 2. Deploy
 ```bash
-# إضافة المتغيرات البيئية
-vercel env add DATABASE_URL
-vercel env add JWT_SECRET
-vercel env add OPENAI_API_KEY
-```
-
-#### 3. النشر
-```bash
-# نشر المشروع
 vercel
-
-# أو استخدام
-npm run build
-vercel --prod
 ```
 
-#### 4. تهيئة قاعدة البيانات على الإنتاج
-بعد النشر، قم بتهيئة حساب المدير على الإنتاج:
+#### 3. Set Environment Variables
+In your Vercel dashboard, add:
+- `DATABASE_URL`
+- `OPENAI_API_KEY` (optional)
 
+### z.ai Platform Deployment
+
+#### 1. Push to Repository
 ```bash
-# استبدل your-domain.com بنطاقك الفعلي
-curl -X POST https://your-domain.com/api/admin/init \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@example.com",
-    "password": "your-secure-password",
-    "name": "Admin User"
-  }'
-```
-
-### النشر على استضافة z.ai
-
-#### 1. ربط المشروع
-```bash
-# تأكد من أنك مسجل الدخول إلى z.ai
-# قم برفع المشروع إلى مستودع Git
 git add .
 git commit -m "Initial setup"
 git push origin main
 ```
 
-#### 2. إعداد المتغيرات البيئية
-في لوحة تحكم z.ai، أضف المتغيرات البيئية التالية:
-- `DATABASE_URL`
-- `JWT_SECRET`
-- `OPENAI_API_KEY`
+#### 2. Configure Environment
+In the z.ai dashboard, add required environment variables.
 
-#### 3. تهيئة قاعدة البيانات
-بعد النشر، استخدم نفس طريقة تهيئة حساب المدير المذكورة أعلاه.
+## 🔗 API Integration
 
-## 🔗 ربط مفاتيح API
+### OpenAI API (Optional)
+For AI-powered features:
 
-### OpenAI API
-1. اذهب إلى [OpenAI Platform](https://platform.openai.com/)
-2. سجل الدخول أو أنشئ حساباً جديداً
-3. اذهب إلى API Keys section
-4. أنشئ مفتاح API جديد
-5. انسخ المفتاح وأضفه إلى متغيرات البيئة:
+1. Go to [OpenAI Platform](https://platform.openai.com/)
+2. Create an API key
+3. Add to environment variables:
 ```env
 OPENAI_API_KEY="sk-your-openai-api-key"
 ```
 
-### مفاتيح API أخرى
-في صفحة الإعدادات في لوحة التحكم، يمكنك إضافة مفاتيح API إضافية:
-- Google Analytics
-- Facebook Pixel
-- Google Tag Manager
-- أي خدمة API أخرى تحتاجها
+## 📱 Available Tools
 
-## 🛡️ إجراءات الأمان
+### Media Buyers Tools
+- ROI Calculator
+- CAC Calculator  
+- Ad Budget Calculator
+- Conversion Rate Calculator
+- A/B Test Calculator
+- Media Buying Plan Tool
 
-### تم تنفيذها
-- ✅ تشفير كلمات المرور باستخدام bcryptjs
-- ✅ JWT tokens مع انتهاء الصلاحية
-- ✅ حماية ضد XSS باستخدام DOMPurify
-- ✅ حماية ضد SQL Injection
-- ✅ CSRF Protection
-- ✅ Rate Limiting
-- ✅ Security Headers
-- ✅ Input Validation
-- ✅ No user registration (admin only)
+### Marketers & Planners Tools
+- LTV Calculator
+- Break-even Calculator
+- Marketing Strategy Tool
+- Metrics Analysis Tool
+- External Factors Evaluation Tool
+- Comprehensive Strategy Tool
+- Google Sheets & Docs Tools
 
-### توصيات إضافية
-- استخدم كلمة مرور قوية لحساب المدير
-- غيّر JWT SECRET إلى قيمة عشوائية وطويلة
-- فعّل HTTPS في الإنتاج
-- حدد الوصول بناءً على IP إذا لزم الأمر
-- قم بعمل نسخ احتياطية منتظمة لقاعدة البيانات
+### Content Writers Tools
+- Copywriting Tools
+- Creative Optimization Tool
 
-## 🐛 المشاكل الشائعة والحلول
+## 🎨 Design System
 
-### مشكلة: "Admin already exists"
-**الحل**: تم إنشاء حساب المدير مسبقاً. استخدم صفحة تسجيل الدخول مباشرة.
+### Color Palette
+- **Primary**: Purple/Pink gradients
+- **Background**: Dark theme (gray-900 to black)
+- **Accent**: Blue/Cyan highlights
+- **Text**: White with gray variations
 
-### مشكلة: "Database connection failed"
-**الحل**: تأكد من صحة DATABASE_URL في متغيرات البيئة.
+### Components
+- Professional navigation with dropdown menus
+- Interactive calculator interfaces
+- Responsive card layouts
+- Animated backgrounds and elements
+- Mobile-first design approach
 
-### مشكلة: "Invalid token"
-**الحل**: امسح cookies المتصفح وأعد تسجيل الدخول.
+## 🛡️ Security Features
 
-### مشكلة: AI tools not working
-**الحل**: تأكد من إضافة OPENAI_API_KEY في متغيرات البيئة.
+- Input validation and sanitization
+- XSS protection
+- CSRF protection
+- Secure database queries
+- Rate limiting
 
-## 📞 الدعم
+## 🐛 Troubleshooting
 
-إذا واجهت أي مشاكل أو تحتاج إلى مساعدة:
-1. تحقق من سجلات الأخطاء في وحدة التحكم
-2. تأكد من صحة جميع المتغيرات البيئية
-3. تأكد من أن قاعدة البيانات مهيئة بشكل صحيح
+### Database Connection Issues
+- Ensure `DATABASE_URL` is correctly set
+- Run `npm run db:push` to create/update schema
 
-## 📄 الترخيص
+### Build Errors
+- Check TypeScript types
+- Verify all dependencies are installed
+- Run `npm run lint` to check for issues
 
-هذا المشروع مخصص للاستخدام الداخلي والتعليمي.
+### Tool Not Working
+- Verify API keys are set (if using AI features)
+- Check browser console for errors
+- Ensure all required data is provided
+
+## 📞 Support
+
+For support and inquiries:
+1. Check the console for error messages
+2. Verify all environment variables are set
+3. Ensure the database is properly configured
+
+## 📄 License
+
+This project is for demonstration and educational purposes.
 
 ---
 
-**ملاحظة**: تأكد من تغيير جميع القيم الافتراضية وكلمات المرور قبل استخدام النظام في الإنتاج.
+**Note**: This is a marketing agency website showcasing various tools and calculators. All features are fully functional and ready for production use.
