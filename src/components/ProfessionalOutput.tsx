@@ -333,7 +333,7 @@ export default function ProfessionalOutput({
         const wordContent = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
         <head><meta charset='utf-8'><title>${title}</title></head>
-        <body>${htmlContent.replace(/<style>[\\s\\S]*?<\\/style>/, '')}</body></html>`
+        <body>${htmlContent.replace(/<style>[\s\S]*?<\/style>/g, '')}</body></html>`
         const blob = new Blob([wordContent], { type: 'application/msword' })
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
